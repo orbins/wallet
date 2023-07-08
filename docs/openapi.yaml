@@ -487,7 +487,7 @@ components:
                 items:
                   type: string
                   example: "Пользователь с таким именем уже существует."
-              emain:
+              email:
                 type: array
                 items:
                   type: string
@@ -650,8 +650,10 @@ components:
             properties:
               detail:
                 type: string
+                example: "Данный токен недействителен для любого типа токена"
               code:
                 type: string
+                example: "token_not_valid"
               messages:
                 type: array
                 items:
@@ -659,7 +661,10 @@ components:
                   properties:
                     token_class:
                       type: string
+                      example: "AccessToken"
                     token_type:
                       type: string
+                      example: "access"
                     message:
                       type: string
+                      example: "Токен недействителен или просрочен"
