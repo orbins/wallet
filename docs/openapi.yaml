@@ -44,20 +44,19 @@ paths:
           $ref: '#/components/responses/TokenObtain400'
     parameters: [ ]
 
-    /auth/token/refresh/:
-      post:
-        tags:
-          - auth
-        summary: Obtain tokens pair
-        requestBody:
-          $ref: '#/components/requestBodies/TokenRefreshRequestBody'
-        responses:
-          '200':
-            $ref: '#/components/responses/TokenRefresh400'
-          '400':
-            $ref: '#/components/responses/TokenObtain400'
-      parameters: [ ]
-
+  /auth/token/refresh/:
+    post:
+      tags:
+        - auth
+      summary: Obtain tokens pair
+      requestBody:
+        $ref: '#/components/requestBodies/TokenRefreshRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/TokenRefresh400'
+        '400':
+          $ref: '#/components/responses/TokenObtain400'
+    parameters: [ ]
 
   '/users/me':
     get:
