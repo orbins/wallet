@@ -30,11 +30,11 @@ paths:
         '400':
           $ref: '#/components/responses/Registration400'
 
-  '/auth/api-token-auth':
+  /auth/token/:
     post:
       tags:
         - auth
-      summary: "Obtain tokens pair"
+      summary: Obtain tokens pair
       requestBody:
         $ref: '#/components/requestBodies/TokenObtainRequestBody'
       responses:
@@ -42,7 +42,21 @@ paths:
           $ref: '#/components/responses/TokenObtain200'
         '400':
           $ref: '#/components/responses/TokenObtain400'
+    parameters: [ ]
 
+  /auth/token/refresh/:
+    post:
+      tags:
+        - auth
+      summary: Obtain tokens pair
+      requestBody:
+        $ref: '#/components/requestBodies/TokenRefreshRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/TokenObtain200'
+        '400':
+          $ref: '#/components/responses/TokenRefresh400'
+    parameters: [ ]
 
   '/users/me':
     get:
@@ -54,8 +68,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/UsersMe200'
-        '400':
-          description: "Unauthorized"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   '/pockets/transactions/':
     get:
@@ -81,7 +95,7 @@ paths:
         '200':
           $ref: '#/components/responses/TransactionsList200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
 
     post:
       tags:
@@ -98,7 +112,7 @@ paths:
         '400':
           $ref: '#/components/responses/TransactionCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
 
   '/pockets/transactions/{transaction_id}/':
     get:
@@ -118,7 +132,7 @@ paths:
         '200':
           $ref: '#/components/responses/Transactions200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     put:
@@ -142,7 +156,7 @@ paths:
         '400':
           $ref: '#/components/responses/TransactionCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     patch:
@@ -166,7 +180,7 @@ paths:
         '400':
           $ref: '#/components/responses/TransactionCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     delete:
@@ -186,7 +200,7 @@ paths:
         '204':
           description: "No Content"
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
 
@@ -203,7 +217,7 @@ paths:
         '200':
           $ref: '#/components/responses/TransactionGlobal200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
 
   '/pockets/categories/':
     get:
@@ -217,7 +231,7 @@ paths:
         '200':
           $ref: '#/components/responses/CategoriesList200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags:
         - pockets
@@ -233,7 +247,7 @@ paths:
         '400':
           $ref: '#/components/responses/CategoryCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
 
   '/pockets/categories/{category_id}/':
     get:
@@ -253,7 +267,7 @@ paths:
         '200':
           $ref: '#/components/responses/Categories200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     put:
@@ -277,7 +291,7 @@ paths:
         '400':
           $ref: '#/components/responses/CategoryCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     patch:
@@ -301,7 +315,7 @@ paths:
         '400':
           $ref: '#/components/responses/CategoryCreate400'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
     delete:
@@ -321,7 +335,7 @@ paths:
         '204':
           description: "No Content"
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: "Not Found"
 
@@ -338,7 +352,7 @@ paths:
         '200':
           $ref: '#/components/responses/CategoriesWithExpensesList200'
         '401':
-          description: "Unauthorized"
+          $ref: '#/components/responses/Unauthorized'
 
 components:
   securitySchemes:
@@ -473,7 +487,7 @@ components:
                 items:
                   type: string
                   example: "Пользователь с таким именем уже существует."
-              emain:
+              email:
                 type: array
                 items:
                   type: string
@@ -486,7 +500,10 @@ components:
           schema:
             type: object
             properties:
-              token:
+              refresh:
+                type: string
+                description: "refresh token"
+              access:
                 type: string
                 description: "access token"
 
@@ -627,3 +644,30 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/CategoryWithExpensesSums'
+    Unauthorized:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                example: "Данный токен недействителен для любого типа токена"
+              code:
+                type: string
+                example: "token_not_valid"
+              messages:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token_class:
+                      type: string
+                      example: "AccessToken"
+                    token_type:
+                      type: string
+                      example: "access"
+                    message:
+                      type: string
+                      example: "Токен недействителен или просрочен"
