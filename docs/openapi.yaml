@@ -53,9 +53,9 @@ paths:
         $ref: '#/components/requestBodies/TokenRefreshRequestBody'
       responses:
         '200':
-          $ref: '#/components/responses/TokenRefresh400'
+          $ref: '#/components/responses/TokenObtain200'
         '400':
-          $ref: '#/components/responses/TokenObtain400'
+          $ref: '#/components/responses/TokenRefresh400'
     parameters: [ ]
 
   '/users/me':
@@ -500,7 +500,10 @@ components:
           schema:
             type: object
             properties:
-              token:
+              refresh:
+                type: string
+                description: "refresh token"
+              access:
                 type: string
                 description: "access token"
 
