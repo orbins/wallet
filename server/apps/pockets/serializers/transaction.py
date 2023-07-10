@@ -16,10 +16,6 @@ class TransactionRetrieveSerializer(serializers.ModelSerializer):
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
-    # category = serializers.PrimaryKeyRelatedField(
-    #     allow_null=True,
-    #     queryset=TransactionCategory.objects.all(),
-    # )
     transaction_type = serializers.ChoiceField(
         choices=TransactionTypes.CHOICES,
     )
