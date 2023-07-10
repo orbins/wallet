@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from ..constants import TransactionErrors
+from ..constants import TransactionErrors, TransactionTypes
 from ..models import Transaction, TransactionCategory
 from .transaction_category import TransactionCategorySerializer
 
@@ -12,15 +12,21 @@ class TransactionRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'transaction_date', 'amount')
+        fields = ('id', 'category', 'transaction_date', 'amount', 'transaction_type')
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=TransactionCategory.objects.all())
+    # category = serializers.PrimaryKeyRelatedField(
+    #     allow_null=True,
+    #     queryset=TransactionCategory.objects.all(),
+    # )
+    transaction_type = serializers.ChoiceField(
+        choices=TransactionTypes.CHOICES,
+    )
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'transaction_date', 'amount')
+        fields = ('id', 'category', 'transaction_date', 'amount', 'transaction_type')
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
         user = self.context['request'].user

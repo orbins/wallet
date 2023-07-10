@@ -1,7 +1,7 @@
 from typing import Final
 
 
-class CategoryTypes:
+class TransactionTypes:
     INCOME: Final[str] = 'income'
     EXPENSE: Final[str] = 'expense'
 
