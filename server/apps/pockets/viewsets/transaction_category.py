@@ -16,9 +16,10 @@ from ..serializers import (
 
 class TransactionCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
+    http_method_names = ("get", "post",)
 
     def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
-        if self.action == 'transactions_by_categories':
+        if self.action == 'list':
             serializer_class = TransactionCategoryTransactionSumSerializer
         else:
             serializer_class = TransactionCategorySerializer
@@ -28,15 +29,8 @@ class TransactionCategoryViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         queryset = TransactionCategory.objects.filter(
             user=self.request.user,
-        ).order_by(
-            '-id',
+        ).annotate_with_transaction_sums().order_by(
+            '-transactions_sum',
         )
 
-        if self.action == 'transactions_by_categories':
-            queryset = queryset.annotate_with_transaction_sums()
-
         return queryset
-
-    @action(methods=('GET',), detail=False, url_path='transactions-by-categories')
-    def transactions_by_categories(self, request: Request, *args, **kwargs) -> Response:
-        return super().list(request, *args, **kwargs)
