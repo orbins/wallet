@@ -20,6 +20,10 @@ class TransactionCategory(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'name'], name='unique_user_category_name')
+        ]
 
     def __str__(self) -> str:
         return f'{self.name}'
+
