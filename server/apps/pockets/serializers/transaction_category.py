@@ -27,11 +27,3 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> TransactionCategory:
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
-
-
-class TransactionCategoryTransactionSumSerializer(serializers.ModelSerializer):
-    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
-
-    class Meta:
-        model = TransactionCategory
-        fields = ('id', 'name', 'transactions_sum')

@@ -26,3 +26,13 @@ class TransactionQuerySet(QuerySet):
                 output_field=DecimalField(),
             ),
         )
+
+    def annotate_category_expenses(self):
+
+        return self.values("category__name").annotate(
+            transactions_sum=Coalesce(
+                Sum('amount'),
+                0,
+                output_field=DecimalField(),
+            ),
+        )

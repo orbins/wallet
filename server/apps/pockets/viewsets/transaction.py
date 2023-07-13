@@ -8,10 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from ..models import Transaction, TransactionCategory
+from ..filters import TransactionFilter
+from ..models import Transaction
 from ..models.querysets import TransactionQuerySet
 from ..serializers import (
-    TransactionCategoryTransactionSumSerializer,
+    ExpenseCategoryTransactionSumSerializer,
     TransactionCreateSerializer,
     TransactionRetrieveSerializer,
     TransactionGlobalSerializer,
@@ -22,12 +23,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
     pagination_class = pagination.LimitOffsetPagination
     pagination_class.default_limit = 20
     permission_classes = (IsAuthenticated,)
+    filterset_class = TransactionFilter
 
     def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == 'total':
             serializer_class = TransactionGlobalSerializer
         elif self.action == 'expenses_by_category':
-            serializer_class = TransactionCategoryTransactionSumSerializer
+            serializer_class = ExpenseCategoryTransactionSumSerializer
         elif self.action in {'create', 'update', 'partial_update'}:
             serializer_class = TransactionCreateSerializer
         else:
@@ -37,9 +39,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self) -> TransactionQuerySet:
         if self.action == "expenses_by_category":
-            queryset = TransactionCategory.objects.filter(
+            queryset = Transaction.objects.filter(
                 user=self.request.user,
-            ).annotate_with_transaction_sums()
+            ).annotate_category_expenses()
         else:
             queryset = Transaction.objects.filter(
                 user=self.request.user,

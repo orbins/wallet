@@ -48,3 +48,15 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
 class TransactionGlobalSerializer(serializers.Serializer):
     total_income = serializers.DecimalField(max_digits=12, decimal_places=2)
     total_expenses = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+
+class ExpenseCategoryTransactionSumSerializer(serializers.ModelSerializer):
+    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+    category = serializers.SerializerMethodField()
+
+    def get_category(self, obj):
+        return obj["category__name"]
+
+    class Meta:
+        model = Transaction
+        fields = ('id', 'category', 'transactions_sum')
