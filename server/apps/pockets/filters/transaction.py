@@ -8,8 +8,8 @@ class TransactionFilter(filters.FilterSet):
     year = filters.NumberFilter(field_name="transaction_date", lookup_expr="year")
     order_by = filters.OrderingFilter(
         fields=(
-            ('-transaction_date', 'date'),
-            ('-amount', 'amount'),
+            ('transaction_date', 'date'),
+            ('amount', 'amount'),
             ('category', 'category'),
         )
     )

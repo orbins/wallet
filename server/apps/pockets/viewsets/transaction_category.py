@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
+from ..filters import TransactionCategoryFilter
 from ..models import TransactionCategory
 from ..serializers import (
     TransactionCategorySerializer,
@@ -12,6 +13,7 @@ class TransactionCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     http_method_names = ("get", "post",)
     serializer_class = TransactionCategorySerializer
+    filterset_class = TransactionCategoryFilter
 
     def get_queryset(self) -> QuerySet:
         queryset = TransactionCategory.objects.filter(

@@ -5,6 +5,8 @@ from ..models import TransactionCategory
 
 
 class TransactionCategorySerializer(serializers.ModelSerializer):
+    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+
     class Meta:
         model = TransactionCategory
         fields = ('id', 'name',)
