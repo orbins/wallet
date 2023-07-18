@@ -4,12 +4,11 @@ from ..constants import TransactionCategoryErrors
 from ..models import TransactionCategory
 
 
-class TransactionCategorySerializer(serializers.ModelSerializer):
-    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TransactionCategory
-        fields = ('id', 'name', 'transactions_sum')
+        fields = ('id', 'name', )
 
     def validate(self, attrs: dict) -> dict:
         user = self.context['request'].user
@@ -29,3 +28,11 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> TransactionCategory:
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+
+class CategoryRetrieveSerializer(serializers.ModelSerializer):
+    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = TransactionCategory
+        fields = ('id', 'name', 'transactions_sum')

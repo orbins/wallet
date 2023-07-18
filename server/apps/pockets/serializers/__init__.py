@@ -6,5 +6,6 @@ from .transaction import (
     TransactionGlobalSerializer,
 )
 from .transaction_category import (
-    TransactionCategorySerializer,
+    CategorySerializer,
+    CategoryRetrieveSerializer,
 )

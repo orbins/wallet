@@ -29,7 +29,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == 'total':
             serializer_class = TransactionGlobalSerializer
-        elif self.action == 'expenses_by_category':
+        elif self.action == 'expenses_by_categories':
             serializer_class = ExpenseCategoryTransactionSumSerializer
         elif self.action == 'get_balance':
             serializer_class = BalanceSerializer
@@ -44,7 +44,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         qs = Transaction.objects.filter(
             user=self.request.user,
         )
-        if self.action == "expenses_by_category":
+        if self.action == 'expenses_by_categories':
             queryset = qs.annotate_category_expenses()
         else:
             queryset = qs.select_related('category',).order_by(
@@ -69,8 +69,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def total(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
 
-    @action(methods=('GET',), detail=False, url_path='expenses-by-category')
-    def expenses_by_category(self, request: Request, *args, **kwargs) -> Response:
+    @action(methods=('GET',), detail=False, url_path='expenses-by-categories')
+    def expenses_by_categories(self, request: Request, *args, **kwargs) -> Response:
         return super().list(request, *args, **kwargs)
 
     @action(methods=('GET',), detail=False, url_path='balance')

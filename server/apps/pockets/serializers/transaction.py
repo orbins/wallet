@@ -4,11 +4,11 @@ from rest_framework import serializers
 
 from ..constants import TransactionErrors, TransactionTypes
 from ..models import Transaction, TransactionCategory
-from .transaction_category import TransactionCategorySerializer
+from .transaction_category import CategorySerializer
 
 
 class TransactionRetrieveSerializer(serializers.ModelSerializer):
-    category = TransactionCategorySerializer()
+    category = CategorySerializer()
 
     class Meta:
         model = Transaction
