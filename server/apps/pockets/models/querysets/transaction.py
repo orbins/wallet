@@ -7,6 +7,8 @@ from ...constants import TransactionTypes
 
 
 class TransactionQuerySet(QuerySet):
+    balance = None
+
     def aggregate_totals(self) -> dict[str, Decimal]:
         return self.aggregate(
             total_income=Coalesce(
@@ -20,7 +22,7 @@ class TransactionQuerySet(QuerySet):
             total_expenses=Coalesce(
                 Sum(
                     'amount',
-                    filter=Q(tansaction_type=TransactionTypes.EXPENSE),
+                    filter=Q(transaction_type=TransactionTypes.EXPENSE),
                 ),
                 0,
                 output_field=DecimalField(),
@@ -28,7 +30,6 @@ class TransactionQuerySet(QuerySet):
         )
 
     def annotate_category_expenses(self):
-
         return self.values("category__name").annotate(
             transactions_sum=Coalesce(
                 Sum('amount'),

@@ -60,3 +60,7 @@ class ExpenseCategoryTransactionSumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('id', 'category', 'transactions_sum')
+
+
+class BalanceSerializer(serializers.Serializer):
+    balance = serializers.DecimalField(max_digits=12, decimal_places=2)

@@ -9,7 +9,7 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TransactionCategory
-        fields = ('id', 'name',)
+        fields = ('id', 'name', 'transactions_sum')
 
     def validate(self, attrs: dict) -> dict:
         user = self.context['request'].user
