@@ -54,7 +54,7 @@ class ExpenseCategoryTransactionSumSerializer(serializers.ModelSerializer):
     transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
     category = serializers.SerializerMethodField()
 
-    def get_category(self, obj):
+    def get_category(self, obj: Transaction) -> str:
         return obj["category__name"]
 
     class Meta:

@@ -15,5 +15,5 @@ class TransactionManager(Manager):
     def annotate_with_transaction_sums(self) -> dict[str, Decimal]:
         return self.get_queryset().aggregate_totals()
 
-    def annotate_category_expenses(self):
+    def annotate_category_expenses(self) -> dict[str, Decimal]:
         return self.get_queryset().annotate_category_expenses()

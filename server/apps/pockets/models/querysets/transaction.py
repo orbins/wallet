@@ -29,7 +29,7 @@ class TransactionQuerySet(QuerySet):
             ),
         )
 
-    def annotate_category_expenses(self):
+    def annotate_category_expenses(self) -> dict[str, Decimal]:
         return self.values("category__name").annotate(
             transactions_sum=Coalesce(
                 Sum('amount'),
