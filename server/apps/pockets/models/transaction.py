@@ -46,7 +46,9 @@ class Transaction(models.Model):
         verbose_name_plural = 'Операции'
 
     def __str__(self) -> str:
-        return f'{self.category} {self.amount}'
+        if self.transaction_type == "income":
+            return f'{self.transaction_type} {self.amount}'
+        return f'{self.transaction_type} {self.category} {self.amount}'
 
     def save(self, *args, **kwargs):
         transaction_type = self.transaction_type
