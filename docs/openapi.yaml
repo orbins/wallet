@@ -1,27 +1,25 @@
 openapi: 3.0.2
 servers:
   - description: API
-    url: http://89.108.102.170/api
+    url: 'http://89.108.102.170/api'
 info:
   title: pockets
   version: 0.1.0
-
 tags:
   - name: auth
-    description: "Auth namespace"
+    description: Auth namespace
   - name: users
-    description: "Users namespace"
+    description: Users namespace
   - name: pockets
-    description: "Pockets namespace"
+    description: Pockets namespace
   - name: transactions
   - name: categories
-
 paths:
-  '/auth/register/':
+  /auth/register/:
     post:
       tags:
         - auth
-      summary: "Registration"
+      summary: Registration
       requestBody:
         $ref: '#/components/requestBodies/RegistrationRequestBody'
       responses:
@@ -29,7 +27,6 @@ paths:
           $ref: '#/components/responses/Registration201'
         '400':
           $ref: '#/components/responses/Registration400'
-
   /auth/token/:
     post:
       tags:
@@ -42,8 +39,7 @@ paths:
           $ref: '#/components/responses/TokenObtain200'
         '400':
           $ref: '#/components/responses/TokenObtain400'
-    parameters: [ ]
-
+    parameters: []
   /auth/token/refresh/:
     post:
       tags:
@@ -56,13 +52,12 @@ paths:
           $ref: '#/components/responses/TokenObtain200'
         '400':
           $ref: '#/components/responses/TokenRefresh400'
-    parameters: [ ]
-
-  '/users/me':
+    parameters: []
+  /users/me:
     get:
       tags:
         - users
-      summary: "User info"
+      summary: User info
       security:
         - bearerAuth: []
       responses:
@@ -70,13 +65,12 @@ paths:
           $ref: '#/components/responses/UsersMe200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
-  '/pockets/transactions/':
+  /pockets/transactions/:
     get:
       tags:
         - pockets
         - transactions
-      summary: "Transactions list"
+      summary: Transactions list
       security:
         - bearerAuth: []
       parameters:
@@ -90,18 +84,16 @@ paths:
           schema:
             type: number
           required: false
-
       responses:
         '200':
           $ref: '#/components/responses/TransactionsList200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
     post:
       tags:
         - pockets
         - transactions
-      summary: "Transaction Create"
+      summary: Transaction Create
       security:
         - bearerAuth: []
       requestBody:
@@ -113,13 +105,12 @@ paths:
           $ref: '#/components/responses/TransactionCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   '/pockets/transactions/{transaction_id}/':
     get:
       tags:
         - pockets
         - transactions
-      summary: "Transaction retrieve"
+      summary: Transaction retrieve
       parameters:
         - name: transaction_id
           in: path
@@ -134,12 +125,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     put:
       tags:
         - pockets
         - transactions
-      summary: "Transaction update"
+      summary: Transaction update
       parameters:
         - name: transaction_id
           in: path
@@ -158,12 +149,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     patch:
       tags:
         - pockets
         - transactions
-      summary: "Transaction partial update"
+      summary: Transaction partial update
       parameters:
         - name: transaction_id
           in: path
@@ -182,12 +173,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     delete:
       tags:
         - pockets
         - transactions
-      summary: "Transaction delete"
+      summary: Transaction delete
       parameters:
         - name: transaction_id
           in: path
@@ -198,45 +189,74 @@ paths:
         - bearerAuth: []
       responses:
         '204':
-          description: "No Content"
+          description: No Content
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
-
-  '/pockets/transactions/global/':
+          description: Not Found
+  /pockets/transactions/global/:
     get:
       tags:
         - pockets
         - transactions
-      summary: "Transactions global"
+      summary: Transactions global
       security:
         - bearerAuth: []
-
       responses:
         '200':
           $ref: '#/components/responses/TransactionGlobal200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
-  '/pockets/categories/':
+  /pockets/transactions/balance/:
     get:
       tags:
         - pockets
-        - categories
-      summary: "Categories list"
+        - transactions
+      summary: Balance
       security:
         - bearerAuth: []
       responses:
         '200':
-          $ref: '#/components/responses/CategoriesList200'
+          $ref: '#/components/responses/TransactionBalance200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      x-stoplight:
+        id: q6ybnmh1ec0hf
+    parameters: []
+  /pockets/transactions/expenses-by-categories/:
+    get:
+      tags:
+        - pockets
+        - transactions
+      summary: Expenses by categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ExpensesByCategories200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      x-stoplight:
+        id: ymucqk0jc9q1t
+    parameters: []
+  /pockets/categories/:
+    get:
+      tags:
+        - pockets
+        - categories
+      summary: Categories list
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoriesWithExpensesList200'
         '401':
           $ref: '#/components/responses/Unauthorized'
     post:
       tags:
         - pockets
         - categories
-      summary: "Categoriy create"
+      summary: Categoriy create
       security:
         - bearerAuth: []
       requestBody:
@@ -248,13 +268,12 @@ paths:
           $ref: '#/components/responses/CategoryCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   '/pockets/categories/{category_id}/':
     get:
       tags:
         - pockets
         - categories
-      summary: "Category retrieve"
+      summary: Category retrieve
       security:
         - bearerAuth: []
       parameters:
@@ -265,16 +284,16 @@ paths:
           required: true
       responses:
         '200':
-          $ref: '#/components/responses/Categories200'
+          $ref: '#/components/responses/CategoriesWithExpensesList200'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     put:
       tags:
         - pockets
         - categories
-      summary: "Category update"
+      summary: Category update
       security:
         - bearerAuth: []
       parameters:
@@ -293,12 +312,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     patch:
       tags:
         - pockets
         - categories
-      summary: "Category partial update"
+      summary: Category partial update
       security:
         - bearerAuth: []
       parameters:
@@ -317,12 +336,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
+          description: Not Found
     delete:
       tags:
         - pockets
         - categories
-      summary: "Category delete"
+      summary: Category delete
       security:
         - bearerAuth: []
       parameters:
@@ -333,48 +352,42 @@ paths:
           required: true
       responses:
         '204':
-          description: "No Content"
+          description: No Content
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          description: "Not Found"
-
-  '/pockets/categories/transactions-by-categories/':
+          description: Not Found
+  /pockets/categories/top-three/:
     get:
       tags:
         - pockets
         - categories
-      summary: "Transaction sums by categories"
+      summary: Categories top three
       security:
         - bearerAuth: []
-
       responses:
         '200':
           $ref: '#/components/responses/CategoriesWithExpensesList200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
+      x-stoplight:
+        id: bo0ce56do603y
+    parameters: []
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   schemas:
     Decimal:
       type: string
-      example: "1000.00"
-
+      example: '1000.00'
     CategoryCreate:
       type: object
       properties:
         name:
           type: string
-        category_type:
-          type: string
-          enum: ["income", "expense"]
-
     CategoryBase:
       allOf:
         - type: object
@@ -382,7 +395,7 @@ components:
             id:
               type: number
         - $ref: '#/components/schemas/CategoryCreate'
-
+      x-examples: {}
     CategoryWithExpensesSums:
       allOf:
         - $ref: '#/components/schemas/CategoryBase'
@@ -390,7 +403,11 @@ components:
           properties:
             transactions_sum:
               $ref: '#/components/schemas/Decimal'
-
+      x-examples:
+        Example 1:
+          id: 0
+          name: string
+          transactions_sum: '1000.00'
     TransactionRetrieve:
       type: object
       properties:
@@ -403,7 +420,12 @@ components:
           format: date
         amount:
           $ref: '#/components/schemas/Decimal'
-
+        transaction_type:
+          x-stoplight:
+            id: 8593dqt17abf1
+          enum:
+            - income
+            - expense
   requestBodies:
     RegistrationRequestBody:
       content:
@@ -416,7 +438,6 @@ components:
               password:
                 type: string
       required: true
-
     TokenObtainRequestBody:
       content:
         application/json:
@@ -429,7 +450,6 @@ components:
               password:
                 type: string
       required: true
-
     TokenRefreshRequestBody:
       content:
         application/json:
@@ -439,7 +459,6 @@ components:
               refresh:
                 type: string
       required: true
-
     TransactionCreateRequestBody:
       content:
         application/json:
@@ -455,16 +474,14 @@ components:
               amount:
                 type: number
       required: true
-
     CategoryCreateRequestBody:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/CategoryCreate'
-
   responses:
     Registration201:
-      description: "Created"
+      description: Created
       content:
         application/json:
           schema:
@@ -474,9 +491,8 @@ components:
                 type: string
               email:
                 type: string
-
     Registration400:
-      description: "Bad Request"
+      description: Bad Request
       content:
         application/json:
           schema:
@@ -486,15 +502,14 @@ components:
                 type: array
                 items:
                   type: string
-                  example: "Пользователь с таким именем уже существует."
+                  example: Пользователь с таким именем уже существует.
               email:
                 type: array
                 items:
                   type: string
-                  example: "Пользователь с таким Email уже существует."
-
+                  example: Пользователь с таким Email уже существует.
     TokenObtain200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
@@ -502,13 +517,12 @@ components:
             properties:
               refresh:
                 type: string
-                description: "refresh token"
+                description: refresh token
               access:
                 type: string
-                description: "access token"
-
+                description: access token
     TokenObtain400:
-      description: "Bad request"
+      description: Bad request
       content:
         application/json:
           schema:
@@ -516,10 +530,9 @@ components:
             properties:
               detail:
                 type: string
-                example: "No active account found with the given credentials"
-
+                example: No active account found with the given credentials
     TokenRefresh400:
-      description: "Bad request"
+      description: Bad request
       content:
         application/json:
           schema:
@@ -527,13 +540,12 @@ components:
             properties:
               detail:
                 type: string
-                example: "Token is invalid or expired"
+                example: Token is invalid or expired
               code:
                 type: string
-                example: "token_not_valid"
-
+                example: token_not_valid
     UsersMe200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
@@ -541,9 +553,8 @@ components:
             properties:
               username:
                 type: string
-
     TransactionsList200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
@@ -563,16 +574,14 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/TransactionRetrieve'
-
     Transactions200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/TransactionRetrieve'
-
     TransactionCreate400:
-      description: "Bad Request"
+      description: Bad Request
       content:
         application/json:
           schema:
@@ -582,16 +591,14 @@ components:
                 type: array
                 items:
                   type: string
-                  example: "Убедитесь, что это значение больше либо равно 0.01."
+                  example: 'Убедитесь, что это значение больше либо равно 0.01.'
               category:
                 type: array
                 items:
                   type: string
-                  example: "У пользователя нет такой категории"
-
-
+                  example: У пользователя нет такой категории
     TransactionGlobal200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
@@ -601,25 +608,22 @@ components:
                 $ref: '#/components/schemas/Decimal'
               total_expenses:
                 $ref: '#/components/schemas/Decimal'
-
     CategoriesList200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
             type: array
             items:
               $ref: '#/components/schemas/CategoryBase'
-
     Categories200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/CategoryBase'
-
     CategoryCreate400:
-      description: "Bad Request"
+      description: Bad Request
       content:
         application/json:
           schema:
@@ -629,15 +633,14 @@ components:
                 type: array
                 items:
                   type: string
-                  example: "У пользоваетля уже существует категория с таким названием и типом"
+                  example: У пользоваетля уже существует категория с таким названием и типом
               category_type:
                 type: array
                 items:
                   type: string
-                  example: "Значения нет среди допустимых вариантов."
-
+                  example: Значения нет среди допустимых вариантов.
     CategoriesWithExpensesList200:
-      description: "Success"
+      description: Success
       content:
         application/json:
           schema:
@@ -653,10 +656,10 @@ components:
             properties:
               detail:
                 type: string
-                example: "Данный токен недействителен для любого типа токена"
+                example: Данный токен недействителен для любого типа токена
               code:
                 type: string
-                example: "token_not_valid"
+                example: token_not_valid
               messages:
                 type: array
                 items:
@@ -664,10 +667,45 @@ components:
                   properties:
                     token_class:
                       type: string
-                      example: "AccessToken"
+                      example: AccessToken
                     token_type:
                       type: string
-                      example: "access"
+                      example: access
                     message:
                       type: string
-                      example: "Токен недействителен или просрочен"
+                      example: Токен недействителен или просрочен
+    ExpensesByCategories200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                nullable: true
+              previous:
+                nullable: true
+              results:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                    transactions_sum:
+                      $ref: '#/components/schemas/Decimal'
+    TransactionBalance200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            x-examples:
+              Example 1:
+                balance: '-1284.00'
+            properties:
+              balance:
+                $ref: '#/components/schemas/Decimal'
+
