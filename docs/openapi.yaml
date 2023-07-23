@@ -367,7 +367,7 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          $ref: '#/components/responses/CategoriesWithExpensesList200'
+          $ref: '#/components/responses/TopCategories200'
         '401':
           $ref: '#/components/responses/Unauthorized'
       x-stoplight:
@@ -707,5 +707,25 @@ components:
                 balance: '-1284.00'
             properties:
               balance:
+                $ref: '#/components/schemas/Decimal'
+    TopCategories200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              Топ категорий:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    transactions_sum:
+                      $ref: '#/components/schemas/Decimal'
+              другое:
                 $ref: '#/components/schemas/Decimal'
 
