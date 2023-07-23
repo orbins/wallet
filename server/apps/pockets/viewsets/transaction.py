@@ -18,6 +18,7 @@ from ..serializers import (
     TransactionRetrieveSerializer,
     TransactionGlobalSerializer,
 )
+from ..services import calculate_balance
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -59,7 +60,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
             obj = self.filter_queryset(queryset).aggregate_totals()
         elif self.action == 'get_balance':
             obj = self.get_queryset().aggregate_totals()
-            obj["balance"] = obj["total_income"] - obj["total_expenses"]
+            total_income = obj["total_income"]
+            total_expense = obj["total_expense"]
+            obj["balance"] = calculate_balance(total_income, total_expense)
         else:
             obj = super().get_object()
 
