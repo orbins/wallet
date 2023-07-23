@@ -18,7 +18,6 @@ from ..serializers import (
     TransactionRetrieveSerializer,
     TransactionGlobalSerializer,
 )
-from ..services import calculate_balance
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -47,6 +46,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
         )
         if self.action == 'expenses_by_categories':
             queryset = qs.annotate_category_expenses()
+        elif self.action == 'get_balance':
+            current_month = timezone.now().month
+            queryset = self.get_queryset().filter(transaction_date__month=current_month)
         else:
             queryset = qs.select_related('category',).order_by(
                 '-transaction_date', '-id',
@@ -54,15 +56,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_object(self) -> Union[Transaction, dict[str, Decimal]]:
+        queryset = self.get_queryset()
         if self.action == 'total':
-            current_month = timezone.now().month
-            queryset = self.get_queryset().filter(transaction_date__month=current_month)
             obj = self.filter_queryset(queryset).aggregate_totals()
         elif self.action == 'get_balance':
             obj = self.get_queryset().aggregate_totals()
-            total_income = obj["total_income"]
-            total_expense = obj["total_expense"]
-            obj["balance"] = calculate_balance(total_income, total_expense)
+            obj["balance"] = obj["total_income"] - obj["total_expense"]
         else:
             obj = super().get_object()
 
