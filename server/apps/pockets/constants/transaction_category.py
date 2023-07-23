@@ -13,4 +13,4 @@ class TransactionTypes:
     CHOICES_DICT: Final[dict[str, str]] = dict(CHOICES)
 
 
-top_three_index = 2
+TOP_CATEGORIES = 3

@@ -162,7 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 ##################################################################
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=os.environ.get('ACCESS_TOKEN_LIFETIME', 1)),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(os.environ.get('ACCESS_TOKEN_LIFETIME', 1))),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,

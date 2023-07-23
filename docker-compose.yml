@@ -14,7 +14,7 @@ services:
     environment:
       DEBUG: 'True'
       DATABASE_URL: 'postgres://postgres:postgres@db:5432/postgres'
-      ACCESS_TOKEN_LIFTIME: 180
+      ACCESS_TOKEN_LIFETIME: 180
 
   db:
     image: postgres:12.4-alpine
