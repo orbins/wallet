@@ -22,7 +22,7 @@ class TransactionCategoryViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == 'create':
-            serializer_class = CategoryCreateSerializer
+            serializer_class = CategorySerializer
         else:
             serializer_class = CategoryRetrieveSerializer
 
