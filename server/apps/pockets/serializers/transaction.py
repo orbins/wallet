@@ -2,25 +2,27 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from ..constants import TransactionErrors
+from ..constants import TransactionErrors, TransactionTypes
 from ..models import Transaction, TransactionCategory
-from .transaction_category import TransactionCategorySerializer
+from .transaction_category import CategorySerializer
 
 
 class TransactionRetrieveSerializer(serializers.ModelSerializer):
-    category = TransactionCategorySerializer()
+    category = CategorySerializer()
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'transaction_date', 'amount')
+        fields = ('id', 'category', 'transaction_date', 'amount', 'transaction_type')
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=TransactionCategory.objects.all())
+    transaction_type = serializers.ChoiceField(
+        choices=TransactionTypes.CHOICES,
+    )
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'transaction_date', 'amount')
+        fields = ('id', 'category', 'transaction_date', 'amount', 'transaction_type')
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
         user = self.context['request'].user
@@ -46,3 +48,19 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
 class TransactionGlobalSerializer(serializers.Serializer):
     total_income = serializers.DecimalField(max_digits=12, decimal_places=2)
     total_expenses = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+
+class ExpenseCategoryTransactionSumSerializer(serializers.ModelSerializer):
+    transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+    category = serializers.SerializerMethodField()
+
+    def get_category(self, obj: Transaction) -> str:
+        return obj["category__name"]
+
+    class Meta:
+        model = Transaction
+        fields = ('id', 'category', 'transactions_sum')
+
+
+class BalanceSerializer(serializers.Serializer):
+    balance = serializers.DecimalField(max_digits=12, decimal_places=2)

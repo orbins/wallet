@@ -1,7 +1,7 @@
 from typing import Final
 
 
-class CategoryTypes:
+class TransactionTypes:
     INCOME: Final[str] = 'income'
     EXPENSE: Final[str] = 'expense'
 
@@ -11,3 +11,6 @@ class CategoryTypes:
     )
 
     CHOICES_DICT: Final[dict[str, str]] = dict(CHOICES)
+
+
+TOP_CATEGORIES = 3
