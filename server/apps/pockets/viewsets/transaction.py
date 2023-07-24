@@ -1,7 +1,6 @@
 from decimal import Decimal
 from typing import Type, Union
 
-from django.utils import timezone
 from rest_framework import viewsets, serializers, pagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -46,9 +45,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
         )
         if self.action == 'expenses_by_categories':
             queryset = qs.annotate_category_expenses()
-        elif self.action == 'get_balance':
-            current_month = timezone.now().month
-            queryset = self.get_queryset().filter(transaction_date__month=current_month)
         else:
             queryset = qs.select_related('category',).order_by(
                 '-transaction_date', '-id',
@@ -60,8 +56,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if self.action == 'total':
             obj = self.filter_queryset(queryset).aggregate_totals()
         elif self.action == 'get_balance':
-            obj = self.get_queryset().aggregate_totals()
-            obj["balance"] = obj["total_income"] - obj["total_expense"]
+            obj = queryset.aggregate_totals()
+            obj["balance"] = obj["total_income"] - obj["total_expenses"]
         else:
             obj = super().get_object()
 

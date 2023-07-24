@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -9,19 +9,19 @@ class Deposit(models.Model):
         related_name='deposits',
         verbose_name='Пользователь',
     )
-    category = models.ForeignKey(
+    goal = models.ForeignKey(
         to='goals.Goal',
         on_delete=models.CASCADE,
         related_name='deposits',
-        verbose_name='Категория',
-        null=True,
+        verbose_name='Цель',
     )
     amount = models.IntegerField(
-        verbose_name='Сумма',
         validators=[
-            MinValueValidator(100),
+            MinValueValidator(10),
+            MaxValueValidator(300000),
         ],
-    ),
+        verbose_name='Сумма',
+    )
     date = models.DateField(
         auto_now=True,
         verbose_name='Дата пополнения',

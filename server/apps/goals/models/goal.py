@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from rest_framework import serializers
 
 from ..constants import GoalError
 
@@ -43,7 +43,7 @@ class Goal(models.Model):
     start_amount = models.IntegerField(
         verbose_name='Начальная сумма',
         validators=[
-            MinValueValidator(100),
+            MinValueValidator(0),
         ],
     )
     percent = models.IntegerField(
@@ -58,7 +58,7 @@ class Goal(models.Model):
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         if self.start_amount > self.target_amount:
-            raise ValidationError(GoalError.TARGET_LESS_DEPOSITED)
-        return super().clean()
+            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+        return super().save(*args, **kwargs)

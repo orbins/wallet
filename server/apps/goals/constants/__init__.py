@@ -1,1 +1,1 @@
-from .goal_errors import GoalError
+from .errors import GoalError
