@@ -29,25 +29,29 @@ class Goal(models.Model):
     )
     term = models.IntegerField(
         verbose_name='Срок',
-        validators=(
+        validators=[
             MinValueValidator(1),
             MaxValueValidator(99),
-        )
+        ]
     )
     target_amount = models.IntegerField(
         verbose_name='Целевая сумма',
-        validators=(MinValueValidator(100)),
+        validators=[
+            MinValueValidator(100),
+        ],
     )
     start_amount = models.IntegerField(
         verbose_name='Начальная сумма',
-        validators=(MinValueValidator(100)),
+        validators=[
+            MinValueValidator(100),
+        ],
     )
     percent = models.IntegerField(
         verbose_name='Процент',
-        validators=(
+        validators=[
             MinValueValidator(0),
             MaxValueValidator(100),
-        ),
+        ],
     )
 
     class Meta:
@@ -58,4 +62,3 @@ class Goal(models.Model):
         if self.start_amount > self.target_amount:
             raise ValidationError(GoalError.TARGET_LESS_DEPOSITED)
         return super().clean()
-
