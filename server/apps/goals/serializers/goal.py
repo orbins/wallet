@@ -25,7 +25,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict) -> dict:
         user = self.context['request'].user
-        start_amount = attrs['start_amount'] or None
+        start_amount = attrs.get('start_amount', None)
         if start_amount:
             totals = Transaction.objects.filter(user=user).aggregate_totals()
             balance = totals['total_income'] - totals['total_expenses']
