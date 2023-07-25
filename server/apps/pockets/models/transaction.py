@@ -46,13 +46,15 @@ class Transaction(models.Model):
         verbose_name_plural = 'Операции'
 
     def __str__(self) -> str:
-        if self.transaction_type == "income":
+        if self.transaction_type == 'income':
             return f'{self.transaction_type} {self.amount}'
         return f'{self.transaction_type} {self.category} {self.amount}'
 
     def save(self, *args, **kwargs):
         transaction_type = self.transaction_type
         category = self.category
-        if transaction_type == "income" and category:
+        if transaction_type == 'income' and category:
             raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
+        elif transaction_type == 'expense' and not category:
+            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
         return super().save(*args, **kwargs)
