@@ -44,7 +44,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         )
         if self.action == 'expenses_by_categories':
-            queryset = qs.annotate_category_expenses()
+            queryset = qs.filter(transaction_type="expense").annotate_category_expenses()
         else:
             queryset = qs.select_related('category',).order_by(
                 '-transaction_date', '-id',
