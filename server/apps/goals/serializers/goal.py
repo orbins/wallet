@@ -14,23 +14,27 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount', 'accumulated_amount', 'category', 'term', 'percent')
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount', 'accumulated_amount', 'category', 'term', 'percent')
 
     def validate(self, attrs: dict) -> dict:
+        accumulated_amount = attrs.get('accumulated_amount', None)
         user = self.context['request'].user
-        start_amount = attrs.get('start_amount', None)
-        if start_amount:
+        if self.context['action'] == 'create':
+            target_amount = attrs['target_amount']
+            if accumulated_amount > target_amount:
+                raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+        if accumulated_amount:
             totals = Transaction.objects.filter(user=user).aggregate_totals()
             balance = totals['total_income'] - totals['total_expenses']
-            if balance < start_amount:
-                raise serializers.ValidationError(GoalError.BALANCE_LESS_START)
+            if balance < accumulated_amount:
+                raise serializers.ValidationError(GoalError.BALANCE_LESS_DEPOSITED)
         return attrs
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
@@ -44,5 +48,3 @@ class GoalCreateSerializer(serializers.ModelSerializer):
     @property
     def data(self) -> OrderedDict:
         return GoalRetrieveSerializer(instance=self.instance).data
-
-

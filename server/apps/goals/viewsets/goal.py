@@ -42,7 +42,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         instance = serializer.save(user=user)
-        amount = instance.start_amount
+        amount = instance.accumulated_amount
         category = instance.category
         created_at = instance.created_at
         Deposit.objects.create(
@@ -60,7 +60,7 @@ class GoalViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         user = self.request.user
-        amount = instance.start_amount
+        amount = instance.accumulated_amount
         created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(

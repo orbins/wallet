@@ -1,9 +1,8 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone, dateformat
-from rest_framework import serializers
 
-from ..constants import GoalError, GoalConstants
+from ..constants import GoalConstants
 
 
 class Goal(models.Model):
@@ -39,10 +38,10 @@ class Goal(models.Model):
             MinValueValidator(GoalConstants.MIN_TARGET_AMOUNT),
         ],
     )
-    start_amount = models.DecimalField(
-        verbose_name='Начальная сумма',
+    accumulated_amount = models.DecimalField(
+        verbose_name='Накопленная сумма',
         validators=[
-            MinValueValidator(GoalConstants.MIN_START_AMOUNT),
+            MinValueValidator(GoalConstants.MIN_ACCUMULATED_AMOUNT),
         ],
     )
     percent = models.PositiveIntegerField(
@@ -57,8 +56,3 @@ class Goal(models.Model):
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
         unique_together = ['user', 'name']
-
-    def save(self, *args, **kwargs):
-        if self.start_amount > self.target_amount:
-            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
-        return super().save(*args, **kwargs)
