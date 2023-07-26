@@ -26,7 +26,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict) -> dict:
         accumulated_amount = attrs.get('accumulated_amount', None)
         user = self.context['request'].user
-        if self.context['action'] == 'create':
+        if self.context['view'].action == 'create':
             target_amount = attrs['target_amount']
             if accumulated_amount > target_amount:
                 raise serializers.ValidationError(GoalError.TARGET_LESS_START)

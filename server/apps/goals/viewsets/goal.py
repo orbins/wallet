@@ -28,7 +28,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         queryset = Goal.objects.filter(
             user=self.request.user,
-        ).order_by("-date")
+        ).order_by("-created_at")
 
         order_by = self.request.query_params.get('order_by')
         if order_by in ('closest', 'further'):
@@ -46,7 +46,6 @@ class GoalViewSet(viewsets.ModelViewSet):
         category = instance.category
         created_at = instance.created_at
         Deposit.objects.create(
-            user=user,
             goal=instance,
             amount=amount
         )
