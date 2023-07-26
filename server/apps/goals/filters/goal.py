@@ -9,8 +9,8 @@ class GoalFilter(filters.FilterSet):
             ('percent', 'lower_percent'),
             ('-target_amount', 'most_expensive'),
             ('target_amount', 'cheapest'),
-            ('date', 'newest'),
-            ('-date', 'oldest'),
+            ('created_at', 'newest'),
+            ('-created_at', 'oldest'),
             ('completion', 'closest'),
             ('-completion', 'further'),
         )

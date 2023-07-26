@@ -1,29 +1,27 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone, dateformat
+
+from ..constants import DepositConstants
 
 
 class Deposit(models.Model):
-    user = models.ForeignKey(
-        to='users.User',
-        on_delete=models.CASCADE,
-        related_name='deposits',
-        verbose_name='Пользователь',
-    )
     goal = models.ForeignKey(
         to='goals.Goal',
         on_delete=models.CASCADE,
         related_name='deposits',
         verbose_name='Цель',
     )
-    amount = models.IntegerField(
+    amount = models.DecimalField(
+        decimal_places=2,
         validators=[
-            MinValueValidator(10),
-            MaxValueValidator(300000),
+            MinValueValidator(DepositConstants.MIN_AMOUNT),
+            MaxValueValidator(DepositConstants.MAX_AMOUNT),
         ],
         verbose_name='Сумма',
     )
-    date = models.DateField(
-        auto_now=True,
+    created_at = models.DateField(
+        default=dateformat.format(timezone.nowe(), 'Y-m-d'),
         verbose_name='Дата пополнения',
     )
 

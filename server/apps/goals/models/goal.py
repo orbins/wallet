@@ -1,8 +1,9 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone, dateformat
 from rest_framework import serializers
 
-from ..constants import GoalError
+from ..constants import GoalError, GoalConstants
 
 
 class Goal(models.Model):
@@ -21,42 +22,41 @@ class Goal(models.Model):
         on_delete=models.CASCADE,
         related_name='goals',
         verbose_name='Категория',
-        null=True,
     )
-    date = models.DateField(
-        auto_now=True,
+    created_at = models.DateField(
+        default=dateformat.format(timezone.nowe(), 'Y-m-d'),
         verbose_name='Дата создания',
     )
-    term = models.IntegerField(
+    term = models.PositiveIntegerField(
         verbose_name='Срок',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(99),
+            MinValueValidator(GoalConstants.MIN_TERM),
         ]
     )
-    target_amount = models.IntegerField(
+    target_amount = models.DecimalField(
         verbose_name='Целевая сумма',
         validators=[
-            MinValueValidator(100),
+            MinValueValidator(GoalConstants.MIN_TARGET_AMOUNT),
         ],
     )
-    start_amount = models.IntegerField(
+    start_amount = models.DecimalField(
         verbose_name='Начальная сумма',
         validators=[
-            MinValueValidator(0),
+            MinValueValidator(GoalConstants.MIN_START_AMOUNT),
         ],
     )
-    percent = models.IntegerField(
+    percent = models.PositiveIntegerField(
         verbose_name='Процент',
         validators=[
-            MinValueValidator(0),
-            MaxValueValidator(100),
+            MinValueValidator(GoalConstants.MIN_PERCENT),
+            MaxValueValidator(GoalConstants.MAX_PERCENT),
         ],
     )
 
     class Meta:
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
+        unique_together = ['user', 'name']
 
     def save(self, *args, **kwargs):
         if self.start_amount > self.target_amount:

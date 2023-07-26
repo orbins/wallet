@@ -1,0 +1,7 @@
+class GoalConstants:
+    MIN_TERM = 1
+    MAX_TERM = 99
+    MIN_PERCENT = 0
+    MAX_PERCENT = 100
+    MIN_START_AMOUNT = 0
+    MIN_TARGET_AMOUNT = 100
