@@ -571,7 +571,7 @@ components:
           type: integer
         name:
           type: string
-        target_amount:
+        accumulated_amount:
           $ref: '#/components/schemas/Decimal'
         start_amount:
           $ref: '#/components/schemas/Decimal'
