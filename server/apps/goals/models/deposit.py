@@ -14,6 +14,7 @@ class Deposit(models.Model):
     )
     amount = models.DecimalField(
         decimal_places=2,
+        max_digits=10,
         validators=[
             MinValueValidator(DepositConstants.MIN_AMOUNT),
             MaxValueValidator(DepositConstants.MAX_AMOUNT),
@@ -21,7 +22,7 @@ class Deposit(models.Model):
         verbose_name='Сумма',
     )
     created_at = models.DateField(
-        default=dateformat.format(timezone.nowe(), 'Y-m-d'),
+        default=dateformat.format(timezone.now(), 'Y-m-d'),
         verbose_name='Дата пополнения',
     )
 

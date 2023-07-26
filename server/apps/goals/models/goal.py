@@ -23,7 +23,7 @@ class Goal(models.Model):
         verbose_name='Категория',
     )
     created_at = models.DateField(
-        default=dateformat.format(timezone.nowe(), 'Y-m-d'),
+        default=dateformat.format(timezone.now(), 'Y-m-d'),
         verbose_name='Дата создания',
     )
     term = models.PositiveIntegerField(
@@ -33,12 +33,16 @@ class Goal(models.Model):
         ]
     )
     target_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=10,
         verbose_name='Целевая сумма',
         validators=[
             MinValueValidator(GoalConstants.MIN_TARGET_AMOUNT),
         ],
     )
     accumulated_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=10,
         verbose_name='Накопленная сумма',
         validators=[
             MinValueValidator(GoalConstants.MIN_ACCUMULATED_AMOUNT),
