@@ -22,7 +22,7 @@ class Deposit(models.Model):
         verbose_name='Сумма',
     )
     created_at = models.DateField(
-        default=dateformat.format(timezone.now(), 'Y-m-d'),
+        default=timezone.now,
         verbose_name='Дата пополнения',
     )
 

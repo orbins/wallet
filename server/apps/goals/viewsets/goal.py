@@ -1,6 +1,4 @@
-import datetime
-from django.db.models import QuerySet, F, ExpressionWrapper, DateField
-from django.db.models.functions import TruncMonth
+from django.db.models import QuerySet
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
@@ -9,6 +7,7 @@ from ..models import Goal, Deposit
 from ..serializers import (
     GoalCreateSerializer, GoalRetrieveSerializer,
 )
+from ...pockets.constants import TransactionTypes
 from ...pockets.models import Transaction
 
 
@@ -30,19 +29,12 @@ class GoalViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         ).order_by("-created_at")
 
-        order_by = self.request.query_params.get('order_by')
-        if order_by in ('closest', 'further'):
-            queryset = queryset.annotate(
-                completion=TruncMonth('created_at') + ExpressionWrapper(
-                    datetime.timedelta(days=30) * F('term'), output_field=DateField())
-            )
-
         return queryset
 
     def perform_create(self, serializer):
         user = self.request.user
         instance = serializer.save(user=user)
-        amount = instance.accumulated_amount
+        amount = instance.start_amount
         category = instance.category
         created_at = instance.created_at
         Deposit.objects.create(
@@ -53,18 +45,18 @@ class GoalViewSet(viewsets.ModelViewSet):
             user=user,
             category=category,
             amount=amount,
-            transaction_type="expense",
+            transaction_type=TransactionTypes.EXPENSE,
             transaction_date=created_at
         )
 
     def perform_destroy(self, instance):
         user = self.request.user
-        amount = instance.accumulated_amount
+        amount = instance.start_amount
         created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(
             user=user,
             amount=amount,
-            transaction_type="income",
+            transaction_type=TransactionTypes.INCOME,
             transaction_date=created_at
         )

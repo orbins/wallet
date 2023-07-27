@@ -1,8 +1,11 @@
+from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils import timezone, dateformat
+from django.utils import timezone
+from rest_framework import serializers
 
 from ..constants import GoalConstants
+from ..constants.errors import GoalError
 
 
 class Goal(models.Model):
@@ -23,8 +26,11 @@ class Goal(models.Model):
         verbose_name='Категория',
     )
     created_at = models.DateField(
-        default=dateformat.format(timezone.now(), 'Y-m-d'),
+        default=timezone.now,
         verbose_name='Дата создания',
+    )
+    expire_date = models.DateField(
+        verbose_name='Дата окончания'
     )
     term = models.PositiveIntegerField(
         verbose_name='Срок',
@@ -40,12 +46,12 @@ class Goal(models.Model):
             MinValueValidator(GoalConstants.MIN_TARGET_AMOUNT),
         ],
     )
-    accumulated_amount = models.DecimalField(
+    start_amount = models.DecimalField(
         decimal_places=2,
         max_digits=10,
         verbose_name='Накопленная сумма',
         validators=[
-            MinValueValidator(GoalConstants.MIN_ACCUMULATED_AMOUNT),
+            MinValueValidator(GoalConstants.MIN_START_AMOUNT),
         ],
     )
     percent = models.PositiveIntegerField(
@@ -60,3 +66,9 @@ class Goal(models.Model):
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
         unique_together = ['user', 'name']
+
+    def save(self, *args, **kwargs):
+        self.expire_date = self.created_at + relativedelta(months=self.term)
+        if self.start_amount > self.target_amount:
+            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+        return super().save(*args, **kwargs)
