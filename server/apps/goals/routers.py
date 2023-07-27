@@ -5,7 +5,7 @@ from .viewsets import GoalViewSet
 goals_router = DefaultRouter()
 
 goals_router.register(
-    prefix='goals',
+    prefix='mine',
     viewset=GoalViewSet,
     basename='goals',
 )

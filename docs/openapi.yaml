@@ -392,12 +392,12 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     parameters: []
-  /pockets/goals/:
+  /goals/mine/:
     get:
       summary: Goals list
       tags:
-        - pockets
         - goals
+        - mine
       responses:
         '200':
           $ref: '#/components/responses/GoalsList200'
@@ -426,15 +426,15 @@ paths:
         '403':
           $ref: '#/components/responses/PermissionDenied'
       tags:
-        - pockets
         - goals
+        - mine
       description: ''
       security:
         - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/GoalCreateRequestBody'
     parameters: []
-  '/pockets/goals/{goal_id}':
+  '/goals/mine/{goal_id}':
     parameters:
       - schema:
           type: string
@@ -444,8 +444,8 @@ paths:
     get:
       summary: Goal retrieve
       tags:
-        - pockets
         - goals
+        - mine
       responses:
         '200':
           $ref: '#/components/responses/GoalsList200'
@@ -473,8 +473,8 @@ paths:
         '404':
           description: Not Found
       tags:
-        - pockets
         - goals
+        - mine
       security:
         - bearerAuth: []
       requestBody:
@@ -494,8 +494,8 @@ paths:
         '404':
           description: Not Found
       tags:
-        - pockets
         - goals
+        - mine
       security:
         - bearerAuth: []
       requestBody:
@@ -515,8 +515,8 @@ paths:
         '404':
           description: Not Found
       tags:
-        - pockets
         - goals
+        - mine
       security:
         - bearerAuth: []
 components:
@@ -571,7 +571,7 @@ components:
           type: integer
         name:
           type: string
-        accumulated_amount:
+        target_amount:
           $ref: '#/components/schemas/Decimal'
         start_amount:
           $ref: '#/components/schemas/Decimal'
