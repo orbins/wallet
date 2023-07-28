@@ -1,1 +1,1 @@
-from .goal import get_deposits_sum
+from .deposit import get_deposits_sum

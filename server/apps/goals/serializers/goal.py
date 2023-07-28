@@ -44,3 +44,10 @@ class GoalCreateSerializer(serializers.ModelSerializer):
     @property
     def data(self) -> OrderedDict:
         return GoalRetrieveSerializer(instance=self.instance).data
+
+    def update(self, instance: Goal, validated_data: dict) -> Goal:
+        start_amount = validated_data.get('start_amount', instance.start_amount)
+        target_amount = validated_data.get('target_amount', instance.target_amount)
+        if start_amount > target_amount:
+            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+        return super().update(instance, validated_data)

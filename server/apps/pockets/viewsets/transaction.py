@@ -83,11 +83,4 @@ class TransactionViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
         elif transaction_type == TransactionTypes.EXPENSE and not category:
             raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
-
-    def perform_update(self, serializer):
-        transaction_type = serializer.validated_data.get('transaction_type', None)
-        category = serializer.validated_data.get('category', None)
-        if transaction_type == TransactionTypes.INCOME and category:
-            raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
-        elif transaction_type == TransactionTypes.EXPENSE and not category:
-            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
+        serializer.save()

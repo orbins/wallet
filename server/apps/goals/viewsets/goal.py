@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
+from ..constants import GoalError
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ...pockets.constants import TransactionTypes
@@ -33,27 +34,29 @@ class GoalViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        start_amount = serializer.validated_data['start_amount']
+        target_amount = serializer.validated_data['target_amount']
+        if start_amount > target_amount:
+            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
         user = self.request.user
         instance = serializer.save(user=user)
-        amount = instance.start_amount
         category = instance.category
         created_at = instance.created_at
         Deposit.objects.create(
             goal=instance,
-            amount=amount
+            amount=start_amount
         )
         Transaction.objects.create(
             user=user,
             category=category,
-            amount=amount,
+            amount=start_amount,
             transaction_type=TransactionTypes.EXPENSE,
             transaction_date=created_at
         )
 
     def perform_destroy(self, instance):
         user = self.request.user
-        deposits_amount = get_deposits_sum(instance.id)
-        total_amount = instance.start_amount + deposits_amount
+        total_amount = get_deposits_sum(instance.id)
         created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(

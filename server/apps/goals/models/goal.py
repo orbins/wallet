@@ -2,10 +2,8 @@ from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
-from rest_framework import serializers
 
 from ..constants import GoalConstants
-from ..constants.errors import GoalError
 
 
 class Goal(models.Model):
@@ -69,6 +67,4 @@ class Goal(models.Model):
 
     def save(self, *args, **kwargs):
         self.expire_date = self.created_at + relativedelta(months=self.term)
-        if self.start_amount > self.target_amount:
-            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
         return super().save(*args, **kwargs)
