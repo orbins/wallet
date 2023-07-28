@@ -53,8 +53,8 @@ class Transaction(models.Model):
     def save(self, *args, **kwargs):
         transaction_type = self.transaction_type
         category = self.category
-        if transaction_type == 'income' and category:
+        if transaction_type == TransactionTypes.INCOME and category:
             raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
-        elif transaction_type == 'expense' and not category:
+        elif transaction_type == TransactionTypes.EXPENSE and not category:
             raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
         return super().save(*args, **kwargs)
