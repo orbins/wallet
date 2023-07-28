@@ -4,11 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
+from ...pockets.constants import TransactionTypes
+from ...pockets.models import Transaction
 from ..serializers import (
     GoalCreateSerializer, GoalRetrieveSerializer,
 )
-from ...pockets.constants import TransactionTypes
-from ...pockets.models import Transaction
+from ..services import get_deposits_sum
 
 
 class GoalViewSet(viewsets.ModelViewSet):
@@ -51,12 +52,13 @@ class GoalViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         user = self.request.user
-        amount = instance.start_amount
+        deposits_amount = get_deposits_sum(instance.id)
+        total_amount = instance.start_amount + deposits_amount
         created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(
             user=user,
-            amount=amount,
+            amount=total_amount,
             transaction_type=TransactionTypes.INCOME,
             transaction_date=created_at
         )

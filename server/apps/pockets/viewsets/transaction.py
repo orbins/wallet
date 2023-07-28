@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from ..constants import TransactionTypes, TransactionErrors
 from ..filters import TransactionFilter
 from ..models import Transaction
 from ..models.querysets import TransactionQuerySet
@@ -44,7 +45,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         )
         if self.action == 'expenses_by_categories':
-            queryset = qs.filter(transaction_type="expense").annotate_category_expenses()
+            queryset = qs.filter(transaction_type=TransactionTypes.EXPENSE).annotate_category_expenses()
         else:
             queryset = qs.select_related('category',).order_by(
                 '-transaction_date', '-id',
@@ -74,3 +75,19 @@ class TransactionViewSet(viewsets.ModelViewSet):
     @action(methods=('GET',), detail=False, url_path='balance')
     def get_balance(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        transaction_type = serializer.validated_data.get('transaction_type', None)
+        category = serializer.validated_data.get('category', None)
+        if transaction_type == TransactionTypes.INCOME and category:
+            raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
+        elif transaction_type == TransactionTypes.EXPENSE and not category:
+            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
+
+    def perform_update(self, serializer):
+        transaction_type = serializer.validated_data.get('transaction_type', None)
+        category = serializer.validated_data.get('category', None)
+        if transaction_type == TransactionTypes.INCOME and category:
+            raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
+        elif transaction_type == TransactionTypes.EXPENSE and not category:
+            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)

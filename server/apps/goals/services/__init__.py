@@ -1,0 +1,1 @@
+from .goal import get_deposits_sum

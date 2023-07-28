@@ -1,6 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils import timezone, dateformat
+from django.utils import timezone
 
 from ..constants import DepositConstants
 
