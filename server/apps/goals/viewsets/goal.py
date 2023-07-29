@@ -2,7 +2,6 @@ from django.db.models import QuerySet
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
-from ..constants import GoalError
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ...pockets.constants import TransactionTypes
