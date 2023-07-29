@@ -11,7 +11,5 @@ class GoalFilter(filters.FilterSet):
             ('target_amount', 'cheapest'),
             ('created_at', 'newest'),
             ('-created_at', 'oldest'),
-            ('expire_date', 'closest'),
-            ('-expire_date', 'further'),
         )
     )
