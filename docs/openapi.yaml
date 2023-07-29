@@ -84,6 +84,10 @@ paths:
           schema:
             type: number
           required: false
+        - schema:
+            type: string
+          in: query
+          name: order_by
       responses:
         '200':
           $ref: '#/components/responses/TransactionsList200'
@@ -124,6 +128,8 @@ paths:
           $ref: '#/components/responses/Transactions200'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     put:
@@ -148,6 +154,8 @@ paths:
           $ref: '#/components/responses/TransactionCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     patch:
@@ -172,6 +180,8 @@ paths:
           $ref: '#/components/responses/TransactionCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     delete:
@@ -192,6 +202,8 @@ paths:
           description: No Content
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
   /pockets/transactions/global/:
@@ -220,8 +232,6 @@ paths:
           $ref: '#/components/responses/TransactionBalance200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-      x-stoplight:
-        id: q6ybnmh1ec0hf
     parameters: []
   /pockets/transactions/expenses-by-categories/:
     get:
@@ -236,8 +246,6 @@ paths:
           $ref: '#/components/responses/ExpensesByCategories200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-      x-stoplight:
-        id: ymucqk0jc9q1t
     parameters: []
   /pockets/categories/:
     get:
@@ -252,18 +260,23 @@ paths:
           $ref: '#/components/responses/CategoriesWithExpensesList200'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: order_by
     post:
       tags:
         - pockets
         - categories
-      summary: Categoriy create
+      summary: Category create
       security:
         - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/CategoryCreateRequestBody'
       responses:
-        '200':
-          $ref: '#/components/responses/CategoriesList200'
+        '201':
+          $ref: '#/components/responses/Categories200'
         '400':
           $ref: '#/components/responses/CategoryCreate400'
         '401':
@@ -284,9 +297,11 @@ paths:
           required: true
       responses:
         '200':
-          $ref: '#/components/responses/CategoriesWithExpensesList200'
+          $ref: '#/components/responses/CategoryWithExpenses200'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     put:
@@ -311,6 +326,8 @@ paths:
           $ref: '#/components/responses/CategoryCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     patch:
@@ -335,6 +352,8 @@ paths:
           $ref: '#/components/responses/CategoryCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
     delete:
@@ -355,6 +374,8 @@ paths:
           description: No Content
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
   /pockets/categories/top-three/:
@@ -370,9 +391,134 @@ paths:
           $ref: '#/components/responses/TopCategories200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-      x-stoplight:
-        id: bo0ce56do603y
     parameters: []
+  /goals/mine/:
+    get:
+      summary: Goals list
+      tags:
+        - goals
+        - mine
+      responses:
+        '200':
+          $ref: '#/components/responses/GoalsList200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      operationId: get-pockets-goals
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: order_by
+      security:
+        - bearerAuth: []
+    post:
+      summary: Goal create
+      operationId: post-pockets-transactions-goals
+      responses:
+        '201':
+          $ref: '#/components/responses/Goals200'
+        '400':
+          $ref: '#/components/responses/GoalsCreate400'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - goals
+        - mine
+      description: ''
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/GoalCreateRequestBody'
+    parameters: []
+  '/goals/mine/{goal_id}':
+    parameters:
+      - schema:
+          type: string
+        name: goal_id
+        in: path
+        required: true
+    get:
+      summary: Goal retrieve
+      tags:
+        - goals
+        - mine
+      responses:
+        '200':
+          $ref: '#/components/responses/GoalsList200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          description: Not Found
+      operationId: get-pockets-goals-goal_id
+      security:
+        - bearerAuth: []
+    put:
+      summary: Goal update
+      operationId: put-pockets-goals-goal_id
+      responses:
+        '200':
+          $ref: '#/components/responses/Goals200'
+        '400':
+          $ref: '#/components/responses/GoalsCreate400'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          description: Not Found
+      tags:
+        - goals
+        - mine
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/GoalCreateRequestBody'
+    patch:
+      summary: Goal partial_update
+      operationId: patch-pockets-goals-goal_id
+      responses:
+        '200':
+          $ref: '#/components/responses/Goals200'
+        '400':
+          $ref: '#/components/responses/GoalsCreate400'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          description: Not Found
+      tags:
+        - goals
+        - mine
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/GoalCreateRequestBody'
+    delete:
+      summary: Goal destroy
+      operationId: delete-pockets-goals-goal_id
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      tags:
+        - goals
+        - mine
+      security:
+        - bearerAuth: []
 components:
   securitySchemes:
     bearerAuth:
@@ -395,7 +541,6 @@ components:
             id:
               type: number
         - $ref: '#/components/schemas/CategoryCreate'
-      x-examples: {}
     CategoryWithExpensesSums:
       allOf:
         - $ref: '#/components/schemas/CategoryBase'
@@ -403,11 +548,6 @@ components:
           properties:
             transactions_sum:
               $ref: '#/components/schemas/Decimal'
-      x-examples:
-        Example 1:
-          id: 0
-          name: string
-          transactions_sum: '1000.00'
     TransactionRetrieve:
       type: object
       properties:
@@ -421,11 +561,26 @@ components:
         amount:
           $ref: '#/components/schemas/Decimal'
         transaction_type:
-          x-stoplight:
-            id: 8593dqt17abf1
           enum:
             - income
             - expense
+    GoalRetrieve:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        target_amount:
+          $ref: '#/components/schemas/Decimal'
+        start_amount:
+          $ref: '#/components/schemas/Decimal'
+        category:
+          $ref: '#/components/schemas/CategoryBase'
+        term:
+          type: integer
+        percent:
+          type: integer
   requestBodies:
     RegistrationRequestBody:
       content:
@@ -473,12 +628,43 @@ components:
                 format: date
               amount:
                 type: number
+              transaction_type:
+                enum:
+                  - income
+                  - expense
       required: true
     CategoryCreateRequestBody:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/CategoryCreate'
+    GoalCreateRequestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            x-examples:
+              Example 1:
+                id: 5
+                name: Накопить
+                target_amount: 102000
+                start_amount: 500
+                category: 1
+                term: 3
+                percent: 7
+            properties:
+              name:
+                type: string
+              target_amount:
+                type: integer
+              start_amount:
+                type: integer
+              category:
+                type: integer
+              term:
+                type: integer
+              percent:
+                type: integer
   responses:
     Registration201:
       description: Created
@@ -597,6 +783,10 @@ components:
                 items:
                   type: string
                   example: У пользователя нет такой категории
+              transaction_type:
+                type: array
+                items:
+                  type: string
     TransactionGlobal200:
       description: Success
       content:
@@ -634,11 +824,6 @@ components:
                 items:
                   type: string
                   example: У пользоваетля уже существует категория с таким названием и типом
-              category_type:
-                type: array
-                items:
-                  type: string
-                  example: Значения нет среди допустимых вариантов.
     CategoriesWithExpensesList200:
       description: Success
       content:
@@ -702,9 +887,6 @@ components:
         application/json:
           schema:
             type: object
-            x-examples:
-              Example 1:
-                balance: '-1284.00'
             properties:
               balance:
                 $ref: '#/components/schemas/Decimal'
@@ -728,4 +910,78 @@ components:
                       $ref: '#/components/schemas/Decimal'
               другое:
                 $ref: '#/components/schemas/Decimal'
-
+    PermissionDenied:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+            x-examples:
+              Example 1:
+                detail: У вас недостаточно прав для выполнения данного действия.
+          examples:
+            Example 1:
+              value:
+                detail: string
+    Goals200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GoalRetrieve'
+          examples:
+            Example 1:
+              value:
+                id: 0
+                name: string
+                target_amount: 0
+                start_amount: 0
+                category:
+                  id: 0
+                  name: string
+                term: 0
+                percent: 0
+    GoalsList200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GoalRetrieve'
+    CategoryWithExpenses200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CategoryWithExpensesSums'
+    GoalsCreate400:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: array
+                items:
+                  type: string
+              target_amount:
+                type: array
+                items:
+                  type: string
+              start_amount:
+                type: array
+                items:
+                  type: string
+              term:
+                type: array
+                items:
+                  type: string
+              percent:
+                type: array
+                items:
+                  type: string

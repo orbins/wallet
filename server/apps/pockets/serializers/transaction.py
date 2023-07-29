@@ -32,6 +32,20 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         else:
             return category
 
+    def validate(self, attrs: dict) -> dict:
+        if self.instance:
+            transaction_type = attrs.get('transaction_type', self.instance.transaction_type)
+            category = attrs.get('category', self.instance.category)
+        else:
+            transaction_type = attrs['transaction_type']
+            category = attrs.get('category', None)
+        if transaction_type == TransactionTypes.INCOME and category:
+            raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
+        elif transaction_type == TransactionTypes.EXPENSE and not category:
+            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
+
+        return attrs
+
     def create(self, validated_data: dict) -> Transaction:
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)

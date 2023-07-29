@@ -7,7 +7,6 @@ from ...constants import TransactionTypes
 
 
 class TransactionQuerySet(QuerySet):
-    balance = None
 
     def aggregate_totals(self) -> dict[str, Decimal]:
         return self.aggregate(

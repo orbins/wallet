@@ -1,13 +1,13 @@
 from decimal import Decimal
 from typing import Type, Union
 
-from django.utils import timezone
 from rest_framework import viewsets, serializers, pagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from ..constants import TransactionTypes, TransactionErrors
 from ..filters import TransactionFilter
 from ..models import Transaction
 from ..models.querysets import TransactionQuerySet
@@ -33,7 +33,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             serializer_class = ExpenseCategoryTransactionSumSerializer
         elif self.action == 'get_balance':
             serializer_class = BalanceSerializer
-        elif self.action in {'create', 'update', 'partial_update'}:
+        elif self.action in ('create', 'update', 'partial_update'):
             serializer_class = TransactionCreateSerializer
         else:
             serializer_class = TransactionRetrieveSerializer
@@ -45,10 +45,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         )
         if self.action == 'expenses_by_categories':
-            queryset = qs.annotate_category_expenses()
-        elif self.action == 'get_balance':
-            current_month = timezone.now().month
-            queryset = self.get_queryset().filter(transaction_date__month=current_month)
+            queryset = qs.filter(transaction_type=TransactionTypes.EXPENSE).annotate_category_expenses()
         else:
             queryset = qs.select_related('category',).order_by(
                 '-transaction_date', '-id',
@@ -60,8 +57,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if self.action == 'total':
             obj = self.filter_queryset(queryset).aggregate_totals()
         elif self.action == 'get_balance':
-            obj = self.get_queryset().aggregate_totals()
-            obj["balance"] = obj["total_income"] - obj["total_expense"]
+            obj = queryset.aggregate_totals()
+            obj["balance"] = obj["total_income"] - obj["total_expenses"]
         else:
             obj = super().get_object()
 
