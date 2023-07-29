@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 
+from .managers import DepositManager
 from ..constants import DepositConstants
 
 
@@ -25,6 +26,8 @@ class Deposit(models.Model):
         default=timezone.now,
         verbose_name='Дата пополнения',
     )
+
+    objects = DepositManager()
 
     class Meta:
         verbose_name = 'Пополнение'

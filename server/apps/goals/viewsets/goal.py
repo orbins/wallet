@@ -10,16 +10,14 @@ from ...pockets.models import Transaction
 from ..serializers import (
     GoalCreateSerializer, GoalRetrieveSerializer,
 )
-from ..services import get_deposits_sum
 
 
 class GoalViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
-    http_method_names = ("get", "post", "delete", "patch", "put")
     filterset_class = GoalFilter
 
     def get_serializer_class(self):
-        if self.action in {'create', 'update', 'partial_update'}:
+        if self.action in ('create', 'update', 'partial_update'):
             serializer = GoalCreateSerializer
         else:
             serializer = GoalRetrieveSerializer
@@ -34,29 +32,27 @@ class GoalViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        start_amount = serializer.validated_data['start_amount']
-        target_amount = serializer.validated_data['target_amount']
-        if start_amount > target_amount:
-            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
         user = self.request.user
         instance = serializer.save(user=user)
+        amount = instance.start_amount
         category = instance.category
         created_at = instance.created_at
         Deposit.objects.create(
             goal=instance,
-            amount=start_amount
+            amount=amount
         )
         Transaction.objects.create(
             user=user,
             category=category,
-            amount=start_amount,
+            amount=amount,
             transaction_type=TransactionTypes.EXPENSE,
             transaction_date=created_at
         )
 
     def perform_destroy(self, instance):
         user = self.request.user
-        total_amount = get_deposits_sum(instance.id)
+        deposits_queryset = Deposit.objects.filter(goal=instance.id).aggregate_amount()
+        total_amount = deposits_queryset['total_amount']
         created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(

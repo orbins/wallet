@@ -1,12 +1,12 @@
 from decimal import Decimal
 
-from django.db.models import QuerySet, Sum, Q, DecimalField
+from django.db.models import QuerySet, Sum, DecimalField
 from django.db.models.functions import Coalesce
 
 
-class TransactionQuerySet(QuerySet):
+class DepositQuerySet(QuerySet):
 
-    def aggregate_deposits_amount(self) -> dict[str, Decimal]:
+    def aggregate_amount(self) -> dict[str, Decimal]:
         return self.aggregate(
             total_amount=Coalesce(
                 Sum(

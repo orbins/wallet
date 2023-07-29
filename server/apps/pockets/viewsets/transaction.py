@@ -33,7 +33,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             serializer_class = ExpenseCategoryTransactionSumSerializer
         elif self.action == 'get_balance':
             serializer_class = BalanceSerializer
-        elif self.action in {'create', 'update', 'partial_update'}:
+        elif self.action in ('create', 'update', 'partial_update'):
             serializer_class = TransactionCreateSerializer
         else:
             serializer_class = TransactionRetrieveSerializer
@@ -75,12 +75,3 @@ class TransactionViewSet(viewsets.ModelViewSet):
     @action(methods=('GET',), detail=False, url_path='balance')
     def get_balance(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        transaction_type = serializer.validated_data.get('transaction_type', None)
-        category = serializer.validated_data.get('category', None)
-        if transaction_type == TransactionTypes.INCOME and category:
-            raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
-        elif transaction_type == TransactionTypes.EXPENSE and not category:
-            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
-        serializer.save()

@@ -27,9 +27,6 @@ class Goal(models.Model):
         default=timezone.now,
         verbose_name='Дата создания',
     )
-    expire_date = models.DateField(
-        verbose_name='Дата окончания'
-    )
     term = models.PositiveIntegerField(
         verbose_name='Срок',
         validators=[
@@ -65,6 +62,6 @@ class Goal(models.Model):
         verbose_name_plural = 'Цели'
         unique_together = ['user', 'name']
 
-    def save(self, *args, **kwargs):
-        self.expire_date = self.created_at + relativedelta(months=self.term)
-        return super().save(*args, **kwargs)
+    @property
+    def expire_date(self):
+        return self.created_at + relativedelta(months=self.term)
