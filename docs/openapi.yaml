@@ -630,6 +630,8 @@ components:
           type: integer
         percent:
           type: integer
+        status:
+          type: boolean
     GoalRefill:
       title: GoalRefill
       type: object
