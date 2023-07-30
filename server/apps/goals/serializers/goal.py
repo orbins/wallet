@@ -32,6 +32,8 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         else:
             start_amount = attrs['start_amount']
             target_amount = attrs['target_amount']
+        if self.context['view'].action in ('update', 'partial_update'):
+            raise serializers.ValidationError(GoalError.CANT_CHANGE_START_AMOUNT)
         if start_amount > target_amount:
             raise serializers.ValidationError(GoalError.TARGET_LESS_START)
         user = self.context['request'].user

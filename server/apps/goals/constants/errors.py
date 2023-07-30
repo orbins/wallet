@@ -7,3 +7,4 @@ class GoalError:
     NOT_USERS_GOAL: Final[str] = 'У пользователя нет такой цели'
     CANT_COMPLETE_GOAL: Final[str] = 'Невозможно завершить цель, пока накопленная сумма меньше целевой'
     GOAL_ALREADY_COMPLETE: Final[str] = 'Выбранная цель уже является выполненной'
+    CANT_CHANGE_START_AMOUNT: Final[str] = 'Нельзя изменить стартовую сумму'
