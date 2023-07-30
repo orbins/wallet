@@ -3,6 +3,15 @@ from rest_framework import serializers
 from ..constants import GoalError
 from ..models import Deposit, Goal
 from ...pockets.models import Transaction
+from ..serializers import GoalRetrieveSerializer
+
+
+class DepositRetrieveSerializer(serializers.ModelSerializer):
+    goal = GoalRetrieveSerializer()
+
+    class Meta:
+        model = Deposit
+        fields = ('id', 'goal', 'amount')
 
 
 class DepositCreateSerializer(serializers.ModelSerializer):
@@ -27,3 +36,7 @@ class DepositCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(GoalError.NOT_USERS_GOAL)
         else:
             return goal
+
+    @property
+    def data(self):
+        return DepositRetrieveSerializer(instance=self.instance).data

@@ -23,7 +23,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'status')
 
     def validate(self, attrs: dict) -> dict:
         if self.instance:
@@ -74,3 +74,8 @@ class GoalCompleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
         fields = ('goal_id',)
+
+    @property
+    def data(self):
+        goal_id = self.validated_data['id']
+        return GoalRetrieveSerializer(instance=Goal.objects.get(id=goal_id)).data
