@@ -543,7 +543,13 @@ paths:
             schema:
               $ref: '#/components/schemas/GoalRefill'
         description: ''
-  /goals/mine/complete/:
+  /goals/mine/{goal_id}/complete/:
+    parameters:
+      - schema:
+          type: string
+        name: goal_id
+        in: path
+        required: true
     patch:
       summary: Завершение цели
       operationId: patch-goals-mine-complete

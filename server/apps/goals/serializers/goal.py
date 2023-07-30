@@ -60,13 +60,13 @@ class GoalCompleteSerializer(serializers.Serializer):
         goal = self.instance
         if goal not in user.goals.all():
             raise serializers.ValidationError(GoalError.NOT_USERS_GOAL)
-        if goal.status == 'true':
+        if goal.status:
             raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
         deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
         total_amount = deposit_queryset['total_amount']
         if total_amount < goal.target_amount:
             raise serializers.ValidationError(GoalError.CANT_COMPLETE_GOAL)
-
+        goal.status = True
         return attrs
 
     @property

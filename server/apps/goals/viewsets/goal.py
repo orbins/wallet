@@ -89,8 +89,6 @@ class GoalViewSet(viewsets.ModelViewSet):
         if self.action == 'complete_goal':
             user = self.request.user
             goal = self.get_object()
-            goal.status = True
-            goal.save()
             deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
             total_amount = deposit_queryset['total_amount']
             Transaction.objects.create(
