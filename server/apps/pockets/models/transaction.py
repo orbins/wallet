@@ -2,11 +2,9 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from rest_framework import serializers
 
-from ..constants import TransactionTypes
-from ..constants.errors import TransactionErrors
 from .managers import TransactionManager
+from ..constants import TransactionTypes
 
 
 class Transaction(models.Model):

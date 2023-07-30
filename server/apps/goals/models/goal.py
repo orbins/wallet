@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 
-from ..constants import GoalConstants
+from ..constants import GoalConstants, GoalStatuses
 
 
 class Goal(models.Model):
@@ -55,6 +55,12 @@ class Goal(models.Model):
             MinValueValidator(GoalConstants.MIN_PERCENT),
             MaxValueValidator(GoalConstants.MAX_PERCENT),
         ],
+    )
+    status = models.CharField(
+        max_length=10,
+        default=GoalStatuses.IN_PROCESS,
+        choices=GoalStatuses.CHOICES,
+        verbose_name='Тип категории',
     )
 
     class Meta:

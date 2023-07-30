@@ -1,9 +1,11 @@
 from typing import OrderedDict
 
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
+from ..constants import GoalStatuses
 from ..constants.errors import GoalError
-from ..models import Goal
+from ..models import Goal, Deposit
 from ...pockets.models import Transaction, TransactionCategory
 from ...pockets.serializers import CategorySerializer
 from ...pockets.constants import TransactionErrors
@@ -14,7 +16,7 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'status')
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
@@ -36,7 +38,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         totals = Transaction.objects.filter(user=user).aggregate_totals()
         balance = totals['total_income'] - totals['total_expenses']
         if balance < start_amount:
-            raise serializers.ValidationError(GoalError.BALANCE_LESS_START)
+            raise serializers.ValidationError(GoalError.BALANCE_LESS_AMOUNT)
         return attrs
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
@@ -44,9 +46,31 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
         if category not in user.categories.all():
             raise serializers.ValidationError(TransactionErrors.NOT_USERS_CATEGORY)
-        else:
-            return category
+        return category
 
     @property
     def data(self) -> OrderedDict:
         return GoalRetrieveSerializer(instance=self.instance).data
+
+
+class GoalCompleteSerializer(serializers.ModelSerializer):
+    goal_id = serializers.IntegerField(source='id', required=True)
+
+    def validate(self, attrs: dict) -> dict:
+        user = self.context['request'].user
+        goal_id = attrs.get('id', None)
+        goal = get_object_or_404(Goal, id=goal_id)
+        if goal not in user.goals.all():
+            raise serializers.ValidationError(GoalError.NOT_USERS_GOAL)
+        if goal.status == GoalStatuses.COMPLETE:
+            raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
+        deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
+        total_amount = deposit_queryset['total_amount']
+        if total_amount < goal.target_amount:
+            raise serializers.ValidationError(GoalError.CANT_COMPLETE_GOAL)
+
+        return attrs
+
+    class Meta:
+        model = Goal
+        fields = ('goal_id',)
