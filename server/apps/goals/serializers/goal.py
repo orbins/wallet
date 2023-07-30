@@ -1,9 +1,7 @@
 from typing import OrderedDict
 
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from ..constants import GoalStatuses
 from ..constants.errors import GoalError
 from ..models import Goal, Deposit
 from ...pockets.models import Transaction, TransactionCategory
@@ -55,16 +53,14 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         return GoalRetrieveSerializer(instance=self.instance).data
 
 
-class GoalCompleteSerializer(serializers.ModelSerializer):
-    goal_id = serializers.IntegerField(source='id', required=True)
+class GoalCompleteSerializer(serializers.Serializer):
 
     def validate(self, attrs: dict) -> dict:
         user = self.context['request'].user
-        goal_id = attrs.get('id', None)
-        goal = get_object_or_404(Goal, id=goal_id)
+        goal = self.instance
         if goal not in user.goals.all():
             raise serializers.ValidationError(GoalError.NOT_USERS_GOAL)
-        if goal.status == GoalStatuses.COMPLETE:
+        if goal.status == 'true':
             raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
         deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
         total_amount = deposit_queryset['total_amount']
@@ -73,11 +69,6 @@ class GoalCompleteSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    class Meta:
-        model = Goal
-        fields = ('goal_id',)
-
     @property
     def data(self):
-        goal_id = self.validated_data['id']
-        return GoalRetrieveSerializer(instance=Goal.objects.get(id=goal_id)).data
+        return GoalRetrieveSerializer(instance=self.instance).data

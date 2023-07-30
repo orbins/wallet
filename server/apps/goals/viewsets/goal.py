@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from ..constants import GoalStatuses
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ...pockets.constants import TransactionTypes
@@ -89,9 +88,8 @@ class GoalViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         if self.action == 'complete_goal':
             user = self.request.user
-            goal_id = serializer.validated_data['id']
-            goal = Goal.objects.get(id=goal_id)
-            goal.status = GoalStatuses.COMPLETE
+            goal = self.get_object()
+            goal.status = True
             goal.save()
             deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
             total_amount = deposit_queryset['total_amount']
@@ -108,10 +106,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def refill_goal(self, request: Request, *args, **kwargs) -> Response:
         return super().create(request, *args, **kwargs)
 
-    @action(methods=('PATCH',), detail=False, url_path='complete')
+    @action(methods=('PATCH',), detail=True, url_path='complete')
     def complete_goal(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        return super().partial_update(request, *args, **kwargs)
 

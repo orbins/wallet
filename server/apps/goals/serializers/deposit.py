@@ -22,7 +22,10 @@ class DepositCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict) -> dict:
         amount = attrs['amount']
+        goal = attrs['goal']
         user = self.context['request'].user
+        if goal.status == 'true':
+            raise serializers.ValidationError(GoalError.CANT_REFILL_COMPLETE_GOAL)
         totals = Transaction.objects.filter(user=user).aggregate_totals()
         balance = totals['total_income'] - totals['total_expenses']
         if balance < amount:

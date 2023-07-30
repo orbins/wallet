@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 
-from ..constants import GoalConstants, GoalStatuses
+from ..constants import GoalConstants
 
 
 class Goal(models.Model):
