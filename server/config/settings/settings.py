@@ -37,7 +37,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'logging.StreamHandler',
         },
@@ -45,7 +45,7 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'ERROR',
             'propagate': True,
         },
     },

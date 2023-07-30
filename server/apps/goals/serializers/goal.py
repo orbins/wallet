@@ -23,7 +23,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'status')
+        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
 
     def validate(self, attrs: dict) -> dict:
         if self.instance:
