@@ -56,11 +56,9 @@ class Goal(models.Model):
             MaxValueValidator(GoalConstants.MAX_PERCENT),
         ],
     )
-    status = models.CharField(
-        max_length=10,
-        default=GoalStatuses.IN_PROCESS,
-        choices=GoalStatuses.CHOICES,
-        verbose_name='Тип категории',
+    status = models.BooleanField(
+        default=False,
+        verbose_name='статус',
     )
 
     class Meta:
