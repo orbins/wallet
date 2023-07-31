@@ -219,3 +219,10 @@ if DEBUG:
     }
     MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
     INSTALLED_APPS += ['debug_toolbar']
+
+
+##################################################################
+# Celery settings
+##################################################################
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
