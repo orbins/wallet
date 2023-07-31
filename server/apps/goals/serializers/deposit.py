@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 
 from ..constants import GoalError
@@ -21,16 +22,18 @@ class DepositCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'goal', 'amount')
 
     def validate(self, attrs: dict) -> dict:
-        amount = attrs['amount']
         goal = attrs['goal']
-        user = self.context['request'].user
-        if goal.status:
+        if goal.is_completed:
             raise serializers.ValidationError(GoalError.CANT_REFILL_COMPLETE_GOAL)
+        return attrs
+
+    def validate_amount(self, amount: Decimal) -> Decimal:
+        user = self.context['request'].user
         totals = Transaction.objects.filter(user=user).aggregate_totals()
         balance = totals['total_income'] - totals['total_expenses']
         if balance < amount:
             raise serializers.ValidationError(GoalError.BALANCE_LESS_AMOUNT)
-        return attrs
+        return amount
 
     def validate_category(self, goal: Goal) -> Goal:
         user = self.context['request'].user
