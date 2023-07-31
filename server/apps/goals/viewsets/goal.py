@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from ..constants import RefillTypes
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ...pockets.constants import TransactionTypes
@@ -62,7 +63,8 @@ class GoalViewSet(viewsets.ModelViewSet):
             category = instance.category
             Deposit.objects.create(
                 goal=instance,
-                amount=amount
+                amount=amount,
+                refill_type=RefillTypes.FROM_USER
             )
             Transaction.objects.create(
                 user=user,
