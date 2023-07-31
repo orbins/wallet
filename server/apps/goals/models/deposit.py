@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from .managers import DepositManager
-from ..constants import DepositConstants
+from ..constants import DepositConstants, RefillTypes
 
 
 class Deposit(models.Model):
@@ -25,6 +25,11 @@ class Deposit(models.Model):
     created_at = models.DateField(
         default=timezone.now,
         verbose_name='Дата пополнения',
+    )
+    refill_type = models.CharField(
+        max_length=15,
+        choices=RefillTypes.CHOICES,
+        verbose_name='Тип пополнения',
     )
 
     objects = DepositManager()
