@@ -226,3 +226,10 @@ if DEBUG:
 ##################################################################
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+
+CELERY_BEAT_SCHEDULE = {
+    'calculate_daily_interest_task': {
+        'task': 'goals.tasks.calculate_daily_percent',
+        'schedule': 86400,
+    },
+}
