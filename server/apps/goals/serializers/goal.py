@@ -82,9 +82,12 @@ class GoalCompleteSerializer(serializers.Serializer):
         goal = self.instance
         if goal.is_completed:
             raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
-        goal.is_completed = True
         return attrs
 
     @property
     def data(self):
         return GoalRetrieveSerializer(instance=self.instance).data
+
+    def update(self, instance, validated_data):
+        instance.is_completed = True
+        return instance
