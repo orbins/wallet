@@ -56,7 +56,7 @@ class Goal(models.Model):
             MaxValueValidator(GoalConstants.MAX_PERCENT),
         ],
     )
-    status = models.BooleanField(
+    is_completed = models.BooleanField(
         default=False,
         verbose_name='статус',
     )

@@ -16,6 +16,7 @@ from ..serializers import (
     GoalCompleteSerializer,
     GoalCreateSerializer,
     GoalRetrieveSerializer,
+    GoalUpdateSerializer,
 )
 
 
@@ -24,8 +25,10 @@ class GoalViewSet(viewsets.ModelViewSet):
     filterset_class = GoalFilter
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action == 'create':
             serializer = GoalCreateSerializer
+        elif self.action in ('update', 'partial_update'):
+            serializer = GoalUpdateSerializer
         elif self.action == 'refill_goal':
             serializer = DepositCreateSerializer
         elif self.action == 'complete_goal':
@@ -91,6 +94,7 @@ class GoalViewSet(viewsets.ModelViewSet):
         if self.action == 'complete_goal':
             user = self.request.user
             goal = self.get_object()
+            serializer.save()
             deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
             total_amount = deposit_queryset['total_amount']
             Transaction.objects.create(
