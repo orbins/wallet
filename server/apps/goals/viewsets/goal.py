@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 from django.utils import timezone
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -109,4 +109,3 @@ class GoalViewSet(viewsets.ModelViewSet):
     @action(methods=('PATCH',), detail=True, url_path='complete')
     def complete_goal(self, request: Request, *args, **kwargs) -> Response:
         return super().partial_update(request, *args, **kwargs)
-
