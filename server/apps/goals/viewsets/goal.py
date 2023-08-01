@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 from django.utils import timezone
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -57,32 +57,28 @@ class GoalViewSet(viewsets.ModelViewSet):
             )
         else:
             instance = serializer.save(user=user)
-            amount = instance.start_amount
-            created_at = instance.created_at
-            category = instance.category
             Deposit.objects.create(
                 goal=instance,
-                amount=amount
+                amount=instance.start_amount
             )
             Transaction.objects.create(
                 user=user,
-                category=category,
-                amount=amount,
+                category=instance.category,
+                amount=instance.start_amount,
                 transaction_type=TransactionTypes.EXPENSE,
-                transaction_date=created_at
+                transaction_date=instance.created_at
             )
 
     def perform_destroy(self, instance):
         user = self.request.user
         deposits_queryset = Deposit.objects.filter(goal=instance).aggregate_amount()
         total_amount = deposits_queryset['total_amount']
-        created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(
             user=user,
             amount=total_amount,
             transaction_type=TransactionTypes.INCOME,
-            transaction_date=created_at
+            transaction_date=instance.created_at
         )
 
     def perform_update(self, serializer):
