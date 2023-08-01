@@ -48,15 +48,12 @@ class GoalViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if self.action == 'refill_goal':
             instance = serializer.save()
-            category = instance.goal.category
-            amount = instance.amount
-            created_at = instance.created_at
             Transaction.objects.create(
                 user=user,
-                category=category,
-                amount=amount,
+                category=instance.goal.category,
+                amount=instance.amount,
                 transaction_type=TransactionTypes.EXPENSE,
-                transaction_date=created_at
+                transaction_date=instance.created_at
             )
         else:
             instance = serializer.save(user=user)
@@ -89,20 +86,17 @@ class GoalViewSet(viewsets.ModelViewSet):
         )
 
     def perform_update(self, serializer):
-        if self.action == 'complete_goal':
-            user = self.request.user
-            goal = self.get_object()
-            serializer.save()
-            deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
-            total_amount = deposit_queryset['total_amount']
-            Transaction.objects.create(
-                user=user,
-                amount=total_amount,
-                transaction_type=TransactionTypes.INCOME,
-                transaction_date=timezone.now(),
-            )
-        else:
-            serializer.save()
+        user = self.request.user
+        goal = self.get_object()
+        serializer.save()
+        deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
+        total_amount = deposit_queryset['total_amount']
+        Transaction.objects.create(
+            user=user,
+            amount=total_amount,
+            transaction_type=TransactionTypes.INCOME,
+            transaction_date=timezone.now(),
+        )
 
     @action(methods=('POST',), detail=False, url_path='refill')
     def refill_goal(self, request: Request, *args, **kwargs) -> Response:
