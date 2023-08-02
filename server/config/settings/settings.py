@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -259,6 +260,10 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_BEAT_SCHEDULE = {
     'calculate_daily_interest_task': {
         'task': 'goals.tasks.calculate_daily_percent',
-        'schedule': 86400,
+        'schedule': timedelta(hours=24),
+    },
+    'print_hello_world': {
+        'task': 'apps.goals.tasks.print_hello_world',
+        'schedule': timedelta(minutes=1),
     },
 }

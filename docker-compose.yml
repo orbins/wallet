@@ -27,12 +27,29 @@ services:
       context: ./
       dockerfile: ./server/Dockerfile
     container_name: celery
+    volumes:
+      - ./server:/server
     environment:
       - CELERY_BROKER=redis://redis:6379/0
     depends_on:
       - server
       - redis
     command: celery --app=config worker -l INFO
+
+  celery-beat:
+    build:
+      context: ./
+      dockerfile: ./server/Dockerfile
+    container_name: celery-beat
+    volumes:
+      - ./server:/server
+    environment:
+      - CELERY_BROKER=redis://redis:6379/0
+    depends_on:
+      - server
+      - redis
+      - celery
+    command: celery --app=config beat -l INFO
 
   redis:
     image: redis:7-alpine3.17
