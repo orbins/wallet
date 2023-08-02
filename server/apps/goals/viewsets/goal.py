@@ -49,62 +49,52 @@ class GoalViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if self.action == 'refill_goal':
             instance = serializer.save()
-            category = instance.goal.category
-            amount = instance.amount
-            created_at = instance.created_at
             Transaction.objects.create(
                 user=user,
-                category=category,
-                amount=amount,
+                category=instance.goal.category,
+                amount=instance.amount,
                 transaction_type=TransactionTypes.EXPENSE,
-                transaction_date=created_at
+                transaction_date=instance.created_at
             )
         else:
             instance = serializer.save(user=user)
-            amount = instance.start_amount
-            created_at = instance.created_at
-            category = instance.category
             Deposit.objects.create(
                 goal=instance,
-                amount=amount,
+                amount=instance.start_amount,
                 refill_type=RefillTypes.FROM_USER
             )
             Transaction.objects.create(
                 user=user,
-                category=category,
-                amount=amount,
+                category=instance.category,
+                amount=instance.start_amount,
                 transaction_type=TransactionTypes.EXPENSE,
-                transaction_date=created_at
+                transaction_date=instance.created_at
             )
 
     def perform_destroy(self, instance):
         user = self.request.user
         deposits_queryset = Deposit.objects.filter(goal=instance).aggregate_amount()
         total_amount = deposits_queryset['total_amount']
-        created_at = instance.created_at
         instance.delete()
         Transaction.objects.create(
             user=user,
             amount=total_amount,
             transaction_type=TransactionTypes.INCOME,
-            transaction_date=created_at
+            transaction_date=instance.created_at
         )
 
     def perform_update(self, serializer):
-        if self.action == 'complete_goal':
-            user = self.request.user
-            goal = self.get_object()
-            serializer.save()
-            deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
-            total_amount = deposit_queryset['total_amount']
-            Transaction.objects.create(
-                user=user,
-                amount=total_amount,
-                transaction_type=TransactionTypes.INCOME,
-                transaction_date=timezone.now(),
-            )
-        else:
-            serializer.save()
+        user = self.request.user
+        goal = self.get_object()
+        serializer.save()
+        deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
+        total_amount = deposit_queryset['total_amount']
+        Transaction.objects.create(
+            user=user,
+            amount=total_amount,
+            transaction_type=TransactionTypes.INCOME,
+            transaction_date=timezone.now(),
+        )
 
     @action(methods=('POST',), detail=False, url_path='refill')
     def refill_goal(self, request: Request, *args, **kwargs) -> Response:

@@ -35,7 +35,7 @@ class DepositCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(GoalError.BALANCE_LESS_AMOUNT)
         return amount
 
-    def validate_category(self, goal: Goal) -> Goal:
+    def validate_goal(self, goal: Goal) -> Goal:
         user = self.context['request'].user
 
         if goal not in user.goals.all():
