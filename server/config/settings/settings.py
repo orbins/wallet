@@ -18,6 +18,37 @@ SITE_ID = 1
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ##################################################################
+# Installed_apps
+##################################################################
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'django_filters',
+]
+
+LOCAL_APPS = [
+    'apps.users',
+    'apps.pockets',
+    'apps.goals'
+]
+
+INSTALLED_APPS += LOCAL_APPS
+
+LOCAL_MIGRATIONS = [app_path.split('.')[1] for app_path in LOCAL_APPS]
+
+MIGRATION_PATH = 'config.migrations.'
+
+MIGRATION_MODULES = {app_name: MIGRATION_PATH + app_name for app_name in LOCAL_MIGRATIONS}
+
+##################################################################
 # Databases settings (with docker)
 ##################################################################
 
@@ -206,8 +237,6 @@ SIMPLE_JWT = {
 ##################################################################
 
 if DEBUG:
-    from .installed_apps import INSTALLED_APPS
-
 
     def show_toolbar(request):
         from django.conf import settings
