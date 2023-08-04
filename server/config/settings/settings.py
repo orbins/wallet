@@ -53,7 +53,7 @@ MIGRATION_MODULES = {app_name: MIGRATION_PATH + app_name for app_name in LOCAL_M
 # Databases settings (with docker)
 ##################################################################
 
-DATABASES = {'default': dj_database_url.config()}
+DATABASES = {'default': dj_database_url.config(default='postgres://postgres:postgres@db:5432/postgres')}
 
 ##################################################################
 # Logging settings
@@ -259,11 +259,7 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 
 CELERY_BEAT_SCHEDULE = {
     'calculate_daily_interest_task': {
-        'task': 'goals.tasks.calculate_daily_percent',
-        'schedule': timedelta(hours=24),
-    },
-    'print_hello_world': {
-        'task': 'apps.goals.tasks.print_hello_world',
-        'schedule': timedelta(minutes=1),
+        'task': 'apps.goals.tasks.calculate_daily_percent',
+        'schedule': timedelta(days=1),
     },
 }

@@ -1,3 +1,5 @@
+import decimal
+
 from celery import shared_task
 
 from .constants import RefillTypes
@@ -10,7 +12,7 @@ def calculate_daily_percent():
     for goal in goals:
         deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
         total_amount = deposit_queryset['total_amount']
-        daily_percent = (total_amount/100) * (goal.term/365)
+        daily_percent = (total_amount/100) * decimal.Decimal(goal.term/365)
         Deposit.objects.create(
             goal=goal,
             amount=daily_percent,
