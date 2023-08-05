@@ -4,7 +4,7 @@ from typing import OrderedDict
 from rest_framework import serializers
 
 from ..constants.errors import GoalError
-from ..models import Goal, Deposit
+from ..models import Goal
 from ...pockets.models import Transaction, TransactionCategory
 from ...pockets.serializers import CategorySerializer
 from ...pockets.constants import TransactionErrors
@@ -59,6 +59,8 @@ class GoalUpdateSerializer(serializers.ModelSerializer):
 
         if start_amount > target_amount:
             raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+
+        return attrs
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
         user = self.context['request'].user

@@ -5,3 +5,4 @@ class GoalConstants:
     MAX_PERCENT = 100
     MIN_START_AMOUNT = 0
     MIN_TARGET_AMOUNT = 100
+    CLOSEST_GOAL_INDEX = 0

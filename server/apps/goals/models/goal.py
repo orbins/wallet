@@ -3,7 +3,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 
-from ..constants import GoalConstants
+from .managers import GoalManager
+from ..constants import GoalConstants, RefillTypes
+from .deposit import Deposit
 
 
 class Goal(models.Model):
@@ -61,6 +63,8 @@ class Goal(models.Model):
         verbose_name='статус',
     )
 
+    objects = GoalManager()
+
     class Meta:
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
@@ -69,3 +73,20 @@ class Goal(models.Model):
     @property
     def expire_date(self):
         return self.created_at + relativedelta(months=self.term)
+
+    @property
+    def days_to_goal(self):
+        delta = self.expire_date - timezone.now().date()
+        return delta.days
+
+    @property
+    def accumulated_amount(self):
+        queryset = Deposit.objects.filter(goal=self)
+        accumulated_amount = queryset.aggregate_amount()['total_amount']
+        return accumulated_amount
+
+    @property
+    def percent_amount(self):
+        queryset = Deposit.objects.filter(goal=self, refill_type=RefillTypes.FROM_PERCENTS)
+        percent_amount = queryset.aggregate_amount()['total_amount']
+        return percent_amount

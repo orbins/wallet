@@ -6,11 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from ..constants import RefillTypes
+from ..constants import RefillTypes, GoalConstants
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
-from ...pockets.constants import TransactionTypes
-from ...pockets.models import Transaction
 from ..serializers import (
     DepositCreateSerializer,
     GoalCompleteSerializer,
@@ -18,6 +16,8 @@ from ..serializers import (
     GoalRetrieveSerializer,
     GoalUpdateSerializer,
 )
+from ...pockets.constants import TransactionTypes
+from ...pockets.models import Transaction, TransactionCategory
 
 
 class GoalViewSet(viewsets.ModelViewSet):
@@ -103,3 +103,57 @@ class GoalViewSet(viewsets.ModelViewSet):
     @action(methods=('PATCH',), detail=True, url_path='complete')
     def complete_goal(self, request: Request, *args, **kwargs) -> Response:
         return super().partial_update(request, *args, **kwargs)
+
+    @action(methods=('GET',), detail=False, url_path='analytics')
+    def analyze_goal(self, request: Request, *args, **kwargs) -> Response:
+        queryset = self.get_queryset()
+
+        closest_goals = [goal.days_to_goal for goal in queryset.filter(is_completed=False) if goal.days_to_goal > 0]
+        if len(closest_goals) > 0:
+            closest_goals.sort()
+            most_closest_goal = closest_goals[GoalConstants.CLOSEST_GOAL_INDEX]
+        else:
+            most_closest_goal = None
+
+        categories = TransactionCategory.objects.filter(
+            goals__in=queryset.filter(is_completed=True)
+        ).annotate_with_goals_counter().order_by('goals_counter')
+        if len(categories) > 0:
+            most_successful_category = categories[1].name
+        else:
+            most_successful_category = None
+        # INDEX
+
+        categories = TransactionCategory.objects.filter(
+            goals__in=queryset).annotate_with_goals_counter().order_by(
+            'goals_counter')
+        if len(categories) > 0:
+            most_popular_category = categories[1].name
+        else:
+            most_popular_category = None
+        # INDEX
+
+        response = {
+            'uncompleted_goals': queryset.count_uncompleted_goals(),
+
+            'total_invested_amount': Deposit.objects.filter(
+                goal__in=queryset.filter(is_completed=False)
+            ).aggregate_amount()['total_amount'],
+
+            'total_percent_amount': Deposit.objects.filter(
+                goal__in=queryset,
+                refill_type=RefillTypes.FROM_PERCENTS
+            ).aggregate_amount()['total_amount'],
+
+            'percent__amount_this_month': Deposit.objects.filter(
+                refill_type=RefillTypes.FROM_PERCENTS,
+                created_at__month=timezone.now().month
+            ).aggregate_amount()['total_amount'],
+
+            'most_closest_goal': most_closest_goal,
+            'most_successful_category': most_successful_category,
+            'most_popular_category': most_popular_category,
+
+        }
+        return Response(response)
+
