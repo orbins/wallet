@@ -6,7 +6,7 @@ class GoalQuerySet(QuerySet):
     def count_uncompleted_goals(self):
         return self.filter(is_completed=False).count()
 
-    def get_analyzed_data(self):
+    # def get_analyzed_data(self):
 
 
     # closest_goals = [goal.days_to_goal for goal in queryset.filter(is_completed=False) if goal.days_to_goal > 0]
