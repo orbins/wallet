@@ -1,10 +1,11 @@
+import decimal
 from decimal import Decimal
 from typing import OrderedDict
 
 from rest_framework import serializers
 
 from ..constants.errors import GoalError
-from ..models import Goal
+from ..models import Goal, Deposit
 from ...pockets.models import Transaction, TransactionCategory
 from ...pockets.serializers import CategorySerializer
 from ...pockets.constants import TransactionErrors
@@ -53,14 +54,14 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
 class GoalUpdateSerializer(serializers.ModelSerializer):
 
-    def validate(self, attrs):
-        start_amount = self.instance.start_amount
-        target_amount = attrs.get('target_amount', self.instance.target_amount)
+    def validate_target_amount(self, target_amount: decimal.Decimal) -> decimal.Decimal:
+        deposit_queryset = Deposit.objects.filter(goal=self.instance).aggregate_amount()
+        accumulated_amount = deposit_queryset['total_amount']
 
-        if start_amount > target_amount:
-            raise serializers.ValidationError(GoalError.TARGET_LESS_START)
+        if accumulated_amount > target_amount:
+            raise serializers.ValidationError(GoalError.TARGET_LESS_ACCUMULATED)
 
-        return attrs
+        return target_amount
 
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
         user = self.context['request'].user
@@ -84,7 +85,17 @@ class GoalCompleteSerializer(serializers.Serializer):
         goal = self.instance
         if goal.is_completed:
             raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
+
         return attrs
+
+    def validate_target_amount(self, target_amount: decimal.Decimal) -> decimal.Decimal:
+        deposit_queryset = Deposit.objects.filter(goal=self.instance).aggregate_amount()
+        accumulated_amount = deposit_queryset['total_amount']
+
+        if accumulated_amount < target_amount:
+            raise serializers.ValidationError(GoalError.NOT_ENOUGH_ACCUMULATED)
+
+        return target_amount
 
     @property
     def data(self):

@@ -94,10 +94,10 @@ class GoalViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     def perform_update(self, serializer):
-        user = self.request.user
-        goal = self.get_object()
         serializer.save()
         if self.action == 'complete':
+            user = self.request.user
+            goal = self.get_object()
             deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
             total_amount = deposit_queryset['total_amount']
             Transaction.objects.create(
