@@ -636,7 +636,7 @@ components:
           type: integer
         percent:
           type: integer
-        status:
+        is_completed:
           type: boolean
     GoalRefill:
       title: GoalRefill

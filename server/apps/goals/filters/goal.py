@@ -5,11 +5,9 @@ class GoalFilter(filters.FilterSet):
 
     order_by = filters.OrderingFilter(
         fields=(
-            ('-percent', 'higher_percent'),
-            ('percent', 'lower_percent'),
-            ('-target_amount', 'most_expensive'),
-            ('target_amount', 'cheapest'),
-            ('created_at', 'newest'),
-            ('-created_at', 'oldest'),
+            ('percent', 'percent'),
+            ('target_amount', 'amount'),
+            ('created_at', 'date'),
+            ('expire_date', 'expire_date')
         )
     )

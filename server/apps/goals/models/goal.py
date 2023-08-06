@@ -35,6 +35,10 @@ class Goal(models.Model):
             MinValueValidator(GoalConstants.MIN_TERM),
         ]
     )
+    expire_date = models.DateField(
+        verbose_name='Дата окончания срока',
+        null=True
+    )
     target_amount = models.DecimalField(
         decimal_places=2,
         max_digits=10,
@@ -70,9 +74,9 @@ class Goal(models.Model):
         verbose_name_plural = 'Цели'
         unique_together = ['user', 'name']
 
-    @property
-    def expire_date(self):
-        return self.created_at + relativedelta(months=self.term)
+    def save(self, *args, **kwargs):
+        self.expire_date = self.created_at + relativedelta(months=self.term)
+        super().save(*args, **kwargs)
 
     @property
     def days_to_goal(self):
