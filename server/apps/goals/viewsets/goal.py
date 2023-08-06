@@ -66,18 +66,19 @@ class GoalViewSet(viewsets.ModelViewSet):
             )
         else:
             instance = serializer.save(user=user)
-            Deposit.objects.create(
-                goal=instance,
-                amount=instance.start_amount,
-                refill_type=RefillTypes.FROM_USER
-            )
-            Transaction.objects.create(
-                user=user,
-                category=instance.category,
-                amount=instance.start_amount,
-                transaction_type=TransactionTypes.EXPENSE,
-                transaction_date=instance.created_at
-            )
+            if instance.start_amount > 0:
+                Deposit.objects.create(
+                    goal=instance,
+                    amount=instance.start_amount,
+                    refill_type=RefillTypes.FROM_USER
+                )
+                Transaction.objects.create(
+                    user=user,
+                    category=instance.category,
+                    amount=instance.start_amount,
+                    transaction_type=TransactionTypes.EXPENSE,
+                    transaction_date=instance.created_at
+                )
 
     def perform_destroy(self, instance):
         user = self.request.user

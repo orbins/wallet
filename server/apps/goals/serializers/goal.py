@@ -15,7 +15,7 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'is_completed')
+        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'is_completed', 'expire_date')
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
