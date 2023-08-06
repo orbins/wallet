@@ -81,29 +81,31 @@ class GoalViewSet(viewsets.ModelViewSet):
                 )
 
     def perform_destroy(self, instance):
-        user = self.request.user
-        deposits_queryset = Deposit.objects.filter(goal=instance).aggregate_amount()
-        total_amount = deposits_queryset['total_amount']
+        if not instance.is_completed:
+            user = self.request.user
+            deposits_queryset = Deposit.objects.filter(goal=instance).aggregate_amount()
+            total_amount = deposits_queryset['total_amount']
+            Transaction.objects.create(
+                user=user,
+                amount=total_amount,
+                transaction_type=TransactionTypes.INCOME,
+                transaction_date=instance.created_at
+            )
         instance.delete()
-        Transaction.objects.create(
-            user=user,
-            amount=total_amount,
-            transaction_type=TransactionTypes.INCOME,
-            transaction_date=instance.created_at
-        )
 
     def perform_update(self, serializer):
         user = self.request.user
         goal = self.get_object()
         serializer.save()
-        deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
-        total_amount = deposit_queryset['total_amount']
-        Transaction.objects.create(
-            user=user,
-            amount=total_amount,
-            transaction_type=TransactionTypes.INCOME,
-            transaction_date=timezone.now(),
-        )
+        if self.action == 'complete':
+            deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
+            total_amount = deposit_queryset['total_amount']
+            Transaction.objects.create(
+                user=user,
+                amount=total_amount,
+                transaction_type=TransactionTypes.INCOME,
+                transaction_date=timezone.now(),
+            )
 
     @action(methods=('POST',), detail=False)
     def refill(self, request: Request, *args, **kwargs) -> Response:
