@@ -16,14 +16,17 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent', 'is_completed', 'expire_date')
+        fields = ('id', 'name', 'target_amount', 'start_amount',
+                  'category', 'created_at', 'term', 'percent',
+                  'is_completed', 'expire_date')
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'start_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount', 'start_amount',
+                  'category', 'term', 'percent')
 
     def validate(self, attrs: dict) -> dict:
         start_amount = attrs['start_amount']
@@ -54,6 +57,11 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
 class GoalUpdateSerializer(serializers.ModelSerializer):
 
+    def validate(self, attrs):
+        if self.instance.is_completed:
+            raise serializers.ValidationError(GoalError.CANT_UPDATE_COMPLETED)
+        return attrs
+
     def validate_target_amount(self, target_amount: decimal.Decimal) -> decimal.Decimal:
         deposit_queryset = Deposit.objects.filter(goal=self.instance).aggregate_amount()
         accumulated_amount = deposit_queryset['total_amount']
@@ -72,7 +80,8 @@ class GoalUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'target_amount', 'category', 'term', 'percent')
+        fields = ('id', 'name', 'target_amount',
+                  'category', 'term', 'percent')
 
     @property
     def data(self):
@@ -86,16 +95,13 @@ class GoalCompleteSerializer(serializers.Serializer):
         if goal.is_completed:
             raise serializers.ValidationError(GoalError.GOAL_ALREADY_COMPLETE)
 
-        return attrs
-
-    def validate_target_amount(self, target_amount: decimal.Decimal) -> decimal.Decimal:
         deposit_queryset = Deposit.objects.filter(goal=self.instance).aggregate_amount()
         accumulated_amount = deposit_queryset['total_amount']
 
-        if accumulated_amount < target_amount:
+        if accumulated_amount < self.instance.target_amount:
             raise serializers.ValidationError(GoalError.NOT_ENOUGH_ACCUMULATED)
 
-        return target_amount
+        return attrs
 
     @property
     def data(self):
@@ -103,4 +109,5 @@ class GoalCompleteSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.is_completed = True
+        instance.save()
         return instance

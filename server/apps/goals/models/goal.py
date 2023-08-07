@@ -1,3 +1,5 @@
+import datetime
+
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -26,7 +28,7 @@ class Goal(models.Model):
         verbose_name='Категория',
     )
     created_at = models.DateField(
-        default=timezone.now,
+        default=datetime.date.today,
         verbose_name='Дата создания',
     )
     term = models.PositiveIntegerField(
@@ -75,7 +77,8 @@ class Goal(models.Model):
         unique_together = ['user', 'name']
 
     def save(self, *args, **kwargs):
-        self.expire_date = self.created_at + relativedelta(months=self.term)
+        if not self.expire_date:
+            self.expire_date = self.created_at + relativedelta(months=self.term)
         super().save(*args, **kwargs)
 
     @property

@@ -10,3 +10,4 @@ class GoalError:
     CANT_REFILL_COMPLETE_GOAL: Final[str] = 'Эта цель уже выполнена, вы не можете её пополнить'
     TARGET_LESS_ACCUMULATED: Final[str] = 'Целевая сумма не может быть меньше накопленной'
     NOT_ENOUGH_ACCUMULATED: Final[str] = 'Не достаточно средств для завершения цели'
+    CANT_UPDATE_COMPLETED: Final[str] = 'Эта цель уже выполнена, вы не можете её изменить'

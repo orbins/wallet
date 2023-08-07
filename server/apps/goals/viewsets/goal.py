@@ -23,20 +23,22 @@ from ...pockets.models import Transaction
 class GoalViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filterset_class = GoalFilter
+    SERIALIZER_CLASS_MAP = {
+        'create': GoalCreateSerializer,
+        'update': GoalUpdateSerializer,
+        'partial_update': GoalUpdateSerializer,
+        'destroy': GoalCreateSerializer,
+        'retrieve': GoalRetrieveSerializer,
+        'list': GoalRetrieveSerializer,
+        'complete': GoalCompleteSerializer,
+        'refill': DepositCreateSerializer,
+    }
 
     def get_serializer_class(self):
-        if self.action == 'create':
-            serializer = GoalCreateSerializer
-        elif self.action in ('update', 'partial_update'):
-            serializer = GoalUpdateSerializer
-        elif self.action == 'refill':
-            serializer = DepositCreateSerializer
-        elif self.action == 'complete':
-            serializer = GoalCompleteSerializer
-        else:
-            serializer = GoalRetrieveSerializer
-
-        return serializer
+        return self.SERIALIZER_CLASS_MAP.get(
+            self.action,
+            GoalRetrieveSerializer
+        )
 
     def get_queryset(self) -> QuerySet:
         queryset = Goal.objects.filter(
@@ -118,4 +120,3 @@ class GoalViewSet(viewsets.ModelViewSet):
     @action(methods=('GET',), detail=False)
     def analyze(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
-
