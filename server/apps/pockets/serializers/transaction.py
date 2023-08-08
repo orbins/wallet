@@ -32,6 +32,12 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         else:
             return category
 
+    def validate_transaction_type(self, transaction_type):
+        if transaction_type == TransactionTypes.PERCENTS:
+            raise serializers.ValidationError(TransactionErrors.INCORRECT_TRANSACTION_TYPE)
+
+        return transaction_type
+
     def validate(self, attrs: dict) -> dict:
         if self.instance:
             transaction_type = attrs.get('transaction_type', self.instance.transaction_type)
@@ -45,6 +51,14 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
 
         return attrs
+
+    def validate_amount(self, amount):
+        user = self.context['request'].user
+        totals = Transaction.objects.filter(user=user).aggregate_totals()
+        balance = totals['total_income'] - totals['total_expenses']
+        if balance < amount:
+            raise serializers.ValidationError(TransactionErrors.NOT_ENOUGH_BALANCE)
+        return amount
 
     def create(self, validated_data: dict) -> Transaction:
         validated_data['user'] = self.context['request'].user

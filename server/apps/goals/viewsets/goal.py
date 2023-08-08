@@ -86,10 +86,10 @@ class GoalViewSet(viewsets.ModelViewSet):
         if not instance.is_completed:
             user = self.request.user
             deposits_queryset = Deposit.objects.filter(goal=instance).aggregate_amount()
-            total_amount = deposits_queryset['total_amount']
+            accumulated_amount = deposits_queryset['total_amount']
             Transaction.objects.create(
                 user=user,
-                amount=total_amount,
+                amount=accumulated_amount,
                 transaction_type=TransactionTypes.INCOME,
                 transaction_date=instance.created_at
             )
@@ -101,12 +101,12 @@ class GoalViewSet(viewsets.ModelViewSet):
             user = self.request.user
             goal = self.get_object()
             deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()
-            total_amount = deposit_queryset['total_amount']
+            accumulated_amount = deposit_queryset['total_amount']
             Transaction.objects.create(
                 user=user,
-                amount=total_amount,
+                amount=accumulated_amount,
                 transaction_type=TransactionTypes.INCOME,
-                transaction_date=timezone.now(),
+                transaction_date=timezone.now().date(),
             )
 
     @action(methods=('POST',), detail=False)

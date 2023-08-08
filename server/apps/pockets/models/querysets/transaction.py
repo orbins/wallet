@@ -26,6 +26,15 @@ class TransactionQuerySet(QuerySet):
                 0,
                 output_field=DecimalField(),
             ),
+            total_percents=Coalesce(
+                Sum(
+                    'amount',
+                    filter=Q(transaction_type=TransactionTypes.PERCENTS),
+                ),
+                0,
+                output_field=DecimalField(),
+            ),
+
         )
 
     def annotate_category_expenses(self):
