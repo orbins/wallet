@@ -3,7 +3,6 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils import timezone
 
 from .managers import GoalManager
 from ..constants import GoalConstants, RefillTypes
@@ -80,11 +79,6 @@ class Goal(models.Model):
         if not self.expire_date:
             self.expire_date = self.created_at + relativedelta(months=self.term)
         super().save(*args, **kwargs)
-
-    @property
-    def days_to_goal(self):
-        delta = self.expire_date - timezone.now().date()
-        return delta.days
 
     @property
     def accumulated_amount(self):

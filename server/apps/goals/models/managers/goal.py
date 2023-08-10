@@ -10,5 +10,8 @@ class GoalManager(Manager):
             using=self._db,
         )
 
-    def count_uncompleted_goals(self):
-        return self.get_queryset().count_uncompleted_goals()
+    def annotate_with_days_to_goal(self):
+        return self.get_queryset().annotate_with_days_to_goal()
+
+    def get_analytical_data(self):
+        return self.get_queryset().get_analytical_data()

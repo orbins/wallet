@@ -31,7 +31,7 @@ class Transaction(models.Model):
         validators=(MinValueValidator(Decimal('0.01')),),
     )
     transaction_type = models.CharField(
-        max_length=7,
+        max_length=8,
         choices=TransactionTypes.CHOICES,
         verbose_name='Тип категории',
         null=True,

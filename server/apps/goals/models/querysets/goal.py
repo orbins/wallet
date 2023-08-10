@@ -1,56 +1,113 @@
-from django.db.models import QuerySet
+from django.db.models import (
+    QuerySet, F, Q,
+    PositiveIntegerField, DecimalField,
+    Sum, Count
+)
+from django.db.models.functions import Coalesce, ExtractDay
+from django.utils import timezone
+
+
+from ...constants import RefillTypes
+from ....pockets.models import TransactionCategory
 
 
 class GoalQuerySet(QuerySet):
 
-    def count_uncompleted_goals(self):
-        return self.filter(is_completed=False).count()
+    def annotate_with_days_to_goal(self) -> QuerySet:
+        return self.annotate(
+            days_to_goal=Coalesce(
+                ExtractDay(F('expire_date') - timezone.now().date()),
+                0,
+                output_field=PositiveIntegerField()
+            )
+        )
 
-    # def get_analyzed_data(self):
+    def total_active_balance(self):
+        return self.aggregate(
+            total_active_balance=Coalesce(
+                Sum(
+                    'deposits__amount',
+                    filter=Q(is_completed=False)
+                    ),
+                0,
+                output_field=DecimalField()
+            )
+        )
 
+    def percents_amount(self):
+        return self.aggregate(
+            total_percents_amount=Coalesce(
+                Sum(
+                    'deposits__amount',
+                    filter=Q(
+                        deposits__refill_type=(
+                            RefillTypes.FROM_PERCENTS
+                        )
+                    )
+                ),
+                0,
+                output_field=DecimalField()
+            ),
+            percents_amount_cur_month=Coalesce(
+                Sum(
+                    'deposits__amount',
+                    filter=Q(
+                        deposits__refill_type=(
+                            RefillTypes.FROM_PERCENTS
+                        ),
+                        created_at__month=timezone.now().month
+                    )
+                ),
+                0,
+                output_field=DecimalField()
+            )
+        )
 
-    # closest_goals = [goal.days_to_goal for goal in queryset.filter(is_completed=False) if goal.days_to_goal > 0]
-    # if len(closest_goals) > 0:
-    #     closest_goals.sort()
-    #     most_closest_goal = closest_goals[GoalConstants.CLOSEST_GOAL_INDEX]
-    # else:
-    #     most_closest_goal = None
-    #
-    # categories = TransactionCategory.objects.filter(
-    #     goals__in=queryset.filter(is_completed=True)
-    # ).annotate_with_goals_counter().order_by('goals_counter')
-    # if len(categories) > 0:
-    #     most_successful_category = categories[1].name
-    # else:
-    #     most_successful_category = None
-    # # INDEX
-    #
-    # categories = TransactionCategory.objects.filter(
-    #     goals__in=queryset).annotate_with_goals_counter().order_by(
-    #     'goals_counter')
-    # if len(categories) > 0:
-    #     most_popular_category = categories[1].name
-    # else:
-    #     most_popular_category = None
-    # # INDEX
-    #
-    # response = {
-    #     'uncompleted_goals': queryset.count_uncompleted_goals(),
-    #
-    #     'total_invested_amount': Deposit.objects.filter(
-    #         goal__in=queryset.filter(is_completed=False)
-    #     ).aggregate_amount()['total_amount'],
-    #
-    #     'total_percent_amount': Deposit.objects.filter(
-    #         goal__in=queryset,
-    #         refill_type=RefillTypes.FROM_PERCENTS
-    #     ).aggregate_amount()['total_amount'],
-    #
-    #     'percent__amount_this_month': Deposit.objects.filter(
-    #         refill_type=RefillTypes.FROM_PERCENTS,
-    #         created_at__month=timezone.now().month
-    #     ).aggregate_amount()['total_amount'],
-    #
-    #     'most_closest_goal': most_closest_goal,
-    #     'most_successful_category': most_successful_category,
-    #     'most_popular_category': most_popular_category,
+    def get_most_popular_category(self):
+        obj = self.values('category').annotate(
+            goal_count=Count('id')
+        ).order_by('-goal_count').first()
+
+        return obj['category'] if obj else None
+
+    def get_most_successful_category(self):
+        obj = self.filter(
+            is_completed=True,
+        ).values(
+            'category'
+        ).annotate(
+            goal_count=Count('id')
+        ).order_by(
+            '-goal_count'
+        ).first()
+
+        return obj['category'] if obj else None
+
+    def get_analytical_data(self):
+        most_closest_goal = self.filter(
+            is_completed=False
+        ).annotate_with_days_to_goal().order_by(
+            'days_to_goal'
+        ).first()
+        most_popular_category = self.get_most_popular_category()
+        most_successful_category = self.get_most_successful_category()
+
+        data = {
+            'active_goals': self.filter(is_completed=False).count(),
+
+            'most_closest_goal': most_closest_goal.days_to_goal if most_closest_goal else None,
+
+            **self.total_active_balance(),
+            **self.percents_amount(),
+
+            'most_popular_category': TransactionCategory.objects.get(
+                id=most_popular_category
+            ) if most_popular_category else None,
+
+            'most_successful_category': TransactionCategory.objects.get(
+                id=most_successful_category
+            ) if most_successful_category else None
+
+        }
+
+        return data

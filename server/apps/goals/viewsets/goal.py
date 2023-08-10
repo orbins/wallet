@@ -11,6 +11,7 @@ from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ..serializers import (
     DepositCreateSerializer,
+    GoalAnalyzeSerializer,
     GoalCompleteSerializer,
     GoalCreateSerializer,
     GoalRetrieveSerializer,
@@ -32,6 +33,7 @@ class GoalViewSet(viewsets.ModelViewSet):
         'list': GoalRetrieveSerializer,
         'complete': GoalCompleteSerializer,
         'refill': DepositCreateSerializer,
+        'analyze': GoalAnalyzeSerializer,
     }
 
     def get_serializer_class(self):
@@ -50,7 +52,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_object(self):
         queryset = self.get_queryset()
         if self.action == 'analyze':
-            obj = self.filter_queryset(queryset).get_analyzed_data()
+            obj = self.filter_queryset(queryset).get_analytical_data()
         else:
             obj = super().get_object()
         return obj

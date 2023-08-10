@@ -111,3 +111,22 @@ class GoalCompleteSerializer(serializers.Serializer):
         instance.is_completed = True
         instance.save()
         return instance
+
+
+class GoalAnalyzeSerializer(serializers.Serializer):
+    active_goals = serializers.IntegerField()
+    most_closest_goal = serializers.IntegerField()
+    total_active_balance = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+    total_percents_amount = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+    percents_amount_cur_month = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+    most_successful_category = CategorySerializer()
+    most_popular_category = CategorySerializer()
