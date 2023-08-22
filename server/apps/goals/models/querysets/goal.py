@@ -22,6 +22,26 @@ class GoalQuerySet(QuerySet):
             )
         )
 
+    def annotate_with_accumulated_amount(self) -> QuerySet:
+        return self.annotate(
+            accumulated_amount=Coalesce(
+                Sum('deposits__amount'),
+                0,
+                output_field=DecimalField()
+            ),
+            accumulated_amount_cur_month=Coalesce(
+                Sum(
+                    'deposits__amount',
+                    filter=Q(
+                        deposits__created_at__month=timezone.now().month,
+                        deposits__created_at__year=timezone.now().year
+                    )
+                ),
+                0,
+                output_field=DecimalField()
+            )
+        )
+
     def total_active_balance(self):
         return self.aggregate(
             total_active_balance=Coalesce(

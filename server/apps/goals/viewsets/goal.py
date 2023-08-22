@@ -46,6 +46,10 @@ class GoalViewSet(viewsets.ModelViewSet):
         queryset = Goal.objects.filter(
             user=self.request.user,
         ).order_by("-created_at")
+        if self.action == 'list':
+            queryset = queryset.annotate_with_days_to_goal(
+            ).annotate_with_accumulated_amount(
+            )
 
         return queryset
 

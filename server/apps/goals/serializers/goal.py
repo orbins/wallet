@@ -13,12 +13,27 @@ from ...pockets.constants import TransactionErrors
 
 class GoalRetrieveSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
+    days_to_goal = serializers.IntegerField(
+        read_only=True
+    )
+    accumulated_sum = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
+    accumulated_sum_cur_month = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
 
     class Meta:
         model = Goal
         fields = ('id', 'name', 'target_amount', 'start_amount',
                   'category', 'created_at', 'term', 'percent',
-                  'is_completed', 'expire_date')
+                  'is_completed', 'expire_date', 'days_to_goal',
+                  'accumulated_sum', 'accumulated_sum_cur_month'
+                  )
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
