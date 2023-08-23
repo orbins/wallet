@@ -37,10 +37,30 @@ class TransactionQuerySet(QuerySet):
 
         )
 
-    def annotate_category_expenses(self):
-        return self.values("category__name").annotate(
-            transactions_sum=Coalesce(
-                Sum('amount'),
+    def calculate_balance(self) -> dict[str, Decimal]:
+        return self.aggregate(
+            balance=
+            Coalesce(
+                Sum(
+                    'amount',
+                    filter=Q(transaction_type=TransactionTypes.INCOME),
+                ),
+                0,
+                output_field=DecimalField(),
+            ) -
+            Coalesce(
+                Sum(
+                    'amount',
+                    filter=Q(transaction_type=TransactionTypes.EXPENSE),
+                ),
+                0,
+                output_field=DecimalField(),
+            ) -
+            Coalesce(
+                Sum(
+                    'amount',
+                    filter=Q(transaction_type=TransactionTypes.PERCENTS),
+                ),
                 0,
                 output_field=DecimalField(),
             ),

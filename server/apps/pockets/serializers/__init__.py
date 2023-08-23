@@ -1,6 +1,5 @@
 from .transaction import (
     BalanceSerializer,
-    ExpenseCategoryTransactionSumSerializer,
     TransactionCreateSerializer,
     TransactionRetrieveSerializer,
     TransactionGlobalSerializer,
