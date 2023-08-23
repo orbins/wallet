@@ -1,3 +1,5 @@
+import decimal
+
 from django.db.models import (
     QuerySet, F, Q,
     PositiveIntegerField, DecimalField,
@@ -131,3 +133,12 @@ class GoalQuerySet(QuerySet):
         }
 
         return data
+
+    def annotate_with_percentage_completion(self):
+        return self.annotate(
+            percentage_completion=Coalesce(
+                Sum('deposits__amount') / F('target_amount') * 100,
+                0,
+                output_field=PositiveIntegerField(),
+            )
+        )

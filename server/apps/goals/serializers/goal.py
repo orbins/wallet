@@ -26,6 +26,9 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
         decimal_places=2,
         read_only=True
     )
+    percentage_completion = serializers.IntegerField(
+        read_only=True,
+    )
 
     class Meta:
         model = Goal
@@ -33,6 +36,7 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
                   'category', 'created_at', 'term', 'percent',
                   'is_completed', 'expire_date', 'days_to_goal',
                   'accumulated_amount', 'accumulated_amount_cur_month',
+                  'percentage_completion'
                   )
 
 

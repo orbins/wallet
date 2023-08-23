@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from ..constants import RefillTypes
+from ..constants import RefillTypes, GoalConstants
 from ..filters import GoalFilter
 from ..models import Goal, Deposit
 from ..serializers import (
@@ -49,6 +49,11 @@ class GoalViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             queryset = queryset.annotate_with_days_to_goal(
             ).annotate_with_accumulated_amount()
+        if self.action == 'top':
+            queryset = queryset.filter(
+                is_completed=False
+            ).annotate_with_percentage_completion(
+            ).order_by('-percentage_completion')[:GoalConstants.TOP_GOALS]
 
         return queryset
 
@@ -126,3 +131,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     @action(methods=('GET',), detail=False)
     def analyze(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
+
+    @action(methods=('GET',), detail=False)
+    def top(self, request: Request, *args, **kwargs) -> Response:
+        return super().list(request, *args, **kwargs)

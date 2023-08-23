@@ -9,3 +9,4 @@ class GoalConstants:
     MIN_START_AMOUNT: Final[Decimal] = Decimal('0')
     MIN_TARGET_AMOUNT: Final[Decimal] = Decimal('0.01')
     CLOSEST_GOAL_INDEX: Final[int] = 0
+    TOP_GOALS = 3
