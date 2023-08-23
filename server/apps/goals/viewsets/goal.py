@@ -45,11 +45,10 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         queryset = Goal.objects.filter(
             user=self.request.user,
-        ).order_by("-created_at")
-        if self.action == 'list':
+        ).order_by('-created_at')
+        if self.action in ('list', 'retrieve'):
             queryset = queryset.annotate_with_days_to_goal(
-            ).annotate_with_accumulated_amount(
-            )
+            ).annotate_with_accumulated_amount()
 
         return queryset
 
@@ -64,6 +63,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         if self.action == 'refill':
+            serializer.validated_data['refill_type'] = RefillTypes.FROM_USER
             instance = serializer.save()
             Transaction.objects.create(
                 user=user,

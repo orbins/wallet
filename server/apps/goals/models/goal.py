@@ -80,14 +80,14 @@ class Goal(models.Model):
             self.expire_date = self.created_at + relativedelta(months=self.term)
         super().save(*args, **kwargs)
 
-    @property
-    def accumulated_amount(self):
-        queryset = Deposit.objects.filter(goal=self)
-        accumulated_amount = queryset.aggregate_amount()['total_amount']
-        return accumulated_amount
+    # @property
+    # def accumulated_amount(self):
+    #     queryset = Deposit.objects.filter(goal=self)
+    #     accumulated_amount = queryset.aggregate_amount()['total_amount']
+    #     return accumulated_amount
 
-    @property
-    def percent_amount(self):
-        queryset = Deposit.objects.filter(goal=self, refill_type=RefillTypes.FROM_PERCENTS)
-        percent_amount = queryset.aggregate_amount()['total_amount']
-        return percent_amount
+    # @property
+    # def percent_amount(self):
+    #     queryset = Deposit.objects.filter(goal=self, refill_type=RefillTypes.FROM_PERCENTS)
+    #     percent_amount = queryset.aggregate_amount()['total_amount']
+    #     return percent_amount
