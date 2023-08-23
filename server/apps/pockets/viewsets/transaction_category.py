@@ -38,16 +38,8 @@ class TransactionCategoryViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @action(methods=('GET',), detail=False, url_path='top-three')
+    @action(methods=('GET',), detail=False, url_path='top')
     def get_top(self, request: Request, *args, **kwargs) -> Response:
-        queryset = self.get_queryset()
-        top_categories_qs = queryset[:TOP_CATEGORIES]
-        serializer = self.get_serializer_class()
-        top_categories_data = serializer(top_categories_qs, many=True).data
-        other_categories_qs = queryset[TOP_CATEGORIES:]
-        other_categories_total_amount = sum(obj.transactions_sum for obj in other_categories_qs)
-        response = {
-            "Топ категорий": top_categories_data,
-            "другое": other_categories_total_amount
-        }
-        return Response(response)
+        data = self.get_queryset().get_top_with_others()
+        serializer = self.get_serializer(data, many=True)
+        return Response(serializer.data)
