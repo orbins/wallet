@@ -8,7 +8,7 @@ from .transaction_category import CategorySerializer
 
 
 class TransactionRetrieveSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategorySerializer(required=False)
 
     class Meta:
         model = Transaction
