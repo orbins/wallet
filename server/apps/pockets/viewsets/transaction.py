@@ -1,8 +1,7 @@
 from decimal import Decimal
 from typing import Type, Union
 
-from django.http import HttpResponse, FileResponse
-from openpyxl import Workbook
+from django.http import FileResponse
 from rest_framework import viewsets, serializers, pagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -18,6 +17,7 @@ from ..serializers import (
     TransactionRetrieveSerializer,
     TransactionGlobalSerializer,
 )
+from ..services import TransactionFileHandler
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -65,32 +65,14 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def get_balance(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
 
-    @action(methods=('GET',), detail=False)
-    def export(self, request: Request, *args, **kwargs) -> FileResponse:
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = f'attachment; filename="{request.user.username}.xlsx"'
-
+    @action(methods=('GET',), detail=False, url_path='export')
+    def export_data(self, request: Request, *args, **kwargs) -> FileResponse:
         transactions = self.get_queryset().only(
             'category', 'transaction_date',
             'amount', 'transaction_type'
         )
+        file = TransactionFileHandler(
+            transactions=transactions
+        ).export_transactions_to_excel()
 
-        wb = Workbook()
-        ws = wb.active
-        ws.title = f'Операции'
-        headers = ['Дата операции', 'Тип операции', 'Категория', 'Сумма']
-        ws.append(headers)
-        for instance in transactions:
-            data = [
-                instance.transaction_date,
-                'Доход' if instance.transaction_type == 'income' else 'Расход',
-                instance.category.name if instance.category else None,
-                instance.amount
-            ]
-            ws.append(data)
-        wb.save(response)
-
-        return response
-
-
-
+        return FileResponse(file, as_attachment=True, filename='transactions.xlsx')
