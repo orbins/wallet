@@ -16,8 +16,10 @@ class TransactionRetrieveSerializer(serializers.ModelSerializer):
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
-    transaction_type = serializers.ChoiceField(
-        choices=TransactionTypes.CHOICES,
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=TransactionCategory.objects.all(),
+        allow_null=True,
+        required=False
     )
 
     class Meta:
@@ -27,7 +29,7 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
     def validate_category(self, category: TransactionCategory) -> TransactionCategory:
         user = self.context['request'].user
 
-        if category not in user.categories.all():
+        if category and category not in user.categories.all():
             raise serializers.ValidationError(TransactionErrors.NOT_USERS_CATEGORY)
         else:
             return category
@@ -47,18 +49,16 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
             category = attrs.get('category', None)
         if transaction_type == TransactionTypes.INCOME and category:
             raise serializers.ValidationError(TransactionErrors.DOES_NOT_SET_CATEGORY)
-        elif transaction_type == TransactionTypes.EXPENSE and not category:
-            raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
-
+        elif transaction_type == TransactionTypes.EXPENSE:
+            if not category:
+                raise serializers.ValidationError(TransactionErrors.CATEGORY_NOT_SPECIFIED)
+            user = self.context['request'].user
+            balance = Transaction.objects.filter(
+                user=user
+            ).calculate_balance()['balance']
+            if balance < attrs['amount']:
+                raise serializers.ValidationError(TransactionErrors.NOT_ENOUGH_BALANCE)
         return attrs
-
-    def validate_amount(self, amount):
-        user = self.context['request'].user
-        totals = Transaction.objects.filter(user=user).aggregate_totals()
-        balance = totals['total_income'] - totals['total_expenses']
-        if balance < amount:
-            raise serializers.ValidationError(TransactionErrors.NOT_ENOUGH_BALANCE)
-        return amount
 
     def create(self, validated_data: dict) -> Transaction:
         validated_data['user'] = self.context['request'].user
