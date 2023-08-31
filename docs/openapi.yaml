@@ -15,7 +15,7 @@ tags:
   - name: transactions
   - name: categories
 paths:
-  /auth/register/:
+  /auth/register:
     post:
       tags:
         - auth
@@ -27,7 +27,10 @@ paths:
           $ref: '#/components/responses/Registration201'
         '400':
           $ref: '#/components/responses/Registration400'
-  /auth/token/:
+      x-stoplight:
+        id: 5spcxak9771tv
+    parameters: []
+  /auth/token:
     post:
       tags:
         - auth
@@ -39,8 +42,10 @@ paths:
           $ref: '#/components/responses/TokenObtain200'
         '400':
           $ref: '#/components/responses/TokenObtain400'
+      x-stoplight:
+        id: 5t76oo6lkb0a1
     parameters: []
-  /auth/token/refresh/:
+  /auth/token/refresh:
     post:
       tags:
         - auth
@@ -52,6 +57,8 @@ paths:
           $ref: '#/components/responses/TokenObtain200'
         '400':
           $ref: '#/components/responses/TokenRefresh400'
+      x-stoplight:
+        id: noyrcoc9ygbfi
     parameters: []
   /users/me:
     get:
@@ -65,7 +72,7 @@ paths:
           $ref: '#/components/responses/UsersMe200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /pockets/transactions/:
+  /pockets/transactions:
     get:
       tags:
         - pockets
@@ -109,7 +116,10 @@ paths:
           $ref: '#/components/responses/TransactionCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  '/pockets/transactions/{transaction_id}/':
+      x-stoplight:
+        id: cfwld3ngnqvrj
+    parameters: []
+  '/pockets/transactions/{transaction_id}':
     get:
       tags:
         - pockets
@@ -132,6 +142,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: 11lboqe41ifgg
     put:
       tags:
         - pockets
@@ -158,6 +170,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: wfqku5qo7qzsu
     patch:
       tags:
         - pockets
@@ -184,6 +198,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: ur1p8o3evj492
     delete:
       tags:
         - pockets
@@ -206,7 +222,15 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
-  /pockets/transactions/global/:
+      x-stoplight:
+        id: dophz1wdndusj
+    parameters:
+      - schema:
+          type: string
+        name: transaction_id
+        in: path
+        required: true
+  /pockets/transactions/total:
     get:
       tags:
         - pockets
@@ -219,7 +243,10 @@ paths:
           $ref: '#/components/responses/TransactionGlobal200'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /pockets/transactions/balance/:
+      x-stoplight:
+        id: 82xk2r226cxmx
+    parameters: []
+  /pockets/transactions/balance:
     get:
       tags:
         - pockets
@@ -232,22 +259,10 @@ paths:
           $ref: '#/components/responses/TransactionBalance200'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      x-stoplight:
+        id: 1rlzg9laitlk1
     parameters: []
-  /pockets/transactions/expenses-by-categories/:
-    get:
-      tags:
-        - pockets
-        - transactions
-      summary: Expenses by categories
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          $ref: '#/components/responses/ExpensesByCategories200'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-    parameters: []
-  /pockets/categories/:
+  /pockets/categories:
     get:
       tags:
         - pockets
@@ -265,6 +280,8 @@ paths:
             type: string
           in: query
           name: order_by
+      x-stoplight:
+        id: hjdlc2c1u2hy5
     post:
       tags:
         - pockets
@@ -281,7 +298,10 @@ paths:
           $ref: '#/components/responses/CategoryCreate400'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  '/pockets/categories/{category_id}/':
+      x-stoplight:
+        id: 08apjd8r55ij5
+    parameters: []
+  '/pockets/categories/{category_id}':
     get:
       tags:
         - pockets
@@ -304,6 +324,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: klrzfl4uoz4hn
     put:
       tags:
         - pockets
@@ -330,6 +352,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: v9d3ruwybw54h
     patch:
       tags:
         - pockets
@@ -356,6 +380,8 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
+      x-stoplight:
+        id: nwwwy9hr9cpl5
     delete:
       tags:
         - pockets
@@ -378,12 +404,20 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           description: Not Found
-  /pockets/categories/top-three/:
+      x-stoplight:
+        id: bmgmiiwmjb40c
+    parameters:
+      - schema:
+          type: string
+        name: category_id
+        in: path
+        required: true
+  /pockets/categories/top:
     get:
       tags:
         - pockets
         - categories
-      summary: Categories top three
+      summary: Categories top
       security:
         - bearerAuth: []
       responses:
@@ -391,13 +425,14 @@ paths:
           $ref: '#/components/responses/TopCategories200'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      x-stoplight:
+        id: h78xi714jru22
     parameters: []
-  /goals/mine/:
+  /api/goals/:
     get:
       summary: Goals list
       tags:
         - goals
-        - mine
       responses:
         '200':
           $ref: '#/components/responses/GoalsList200'
@@ -413,6 +448,8 @@ paths:
           name: order_by
       security:
         - bearerAuth: []
+      x-stoplight:
+        id: 43yuigccjlneh
     post:
       summary: Goal create
       operationId: post-pockets-transactions-goals
@@ -433,8 +470,10 @@ paths:
         - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/GoalCreateRequestBody'
+      x-stoplight:
+        id: saqecja03lamy
     parameters: []
-  '/goals/mine/{goal_id}/':
+  '/api/goals/{goal_id}':
     parameters:
       - schema:
           type: string
@@ -445,7 +484,6 @@ paths:
       summary: Goal retrieve
       tags:
         - goals
-        - mine
       responses:
         '200':
           $ref: '#/components/responses/Goals200'
@@ -458,6 +496,8 @@ paths:
       operationId: get-pockets-goals-goal_id
       security:
         - bearerAuth: []
+      x-stoplight:
+        id: jpfj3jqv4nads
     put:
       summary: Goal update
       operationId: put-pockets-goals-goal_id
@@ -479,6 +519,8 @@ paths:
         - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/GoalCreateRequestBody'
+      x-stoplight:
+        id: ernxidons0ftp
     patch:
       summary: Goal partial_update
       operationId: patch-pockets-goals-goal_id
@@ -500,6 +542,8 @@ paths:
         - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/GoalCreateRequestBody'
+      x-stoplight:
+        id: pfckkx3uhvn6n
     delete:
       summary: Goal destroy
       operationId: delete-pockets-goals-goal_id
@@ -519,7 +563,9 @@ paths:
         - mine
       security:
         - bearerAuth: []
-  /goals/mine/refill/:
+      x-stoplight:
+        id: l6ouy1e6z723i
+  /api/goals/refill:
     post:
       summary: Пополнение цели
       operationId: post-goals-mine-refill
@@ -534,7 +580,6 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
       tags:
         - goals
-        - mine
       security:
         - bearerAuth: []
       requestBody:
@@ -543,7 +588,10 @@ paths:
             schema:
               $ref: '#/components/schemas/GoalRefill'
         description: ''
-  /goals/mine/{goal_id}/complete/:
+      x-stoplight:
+        id: 0q2q3jkt113n0
+    parameters: []
+  '/api/goals/{goal_id}/complete':
     parameters:
       - schema:
           type: string
@@ -564,16 +612,109 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
       tags:
         - goals
-        - mine
       description: ''
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                goal_id:
-                  type: integer
+        content: {}
+      x-stoplight:
+        id: j8kjb2kzs0wmt
+  /goals/analyze:
+    get:
+      summary: Goals analyze
+      tags:
+        - goals
+      responses:
+        '200':
+          $ref: '#/components/responses/GoalAnalyze200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      operationId: get-goals-analyze
+      x-stoplight:
+        id: g9rd5t4a6uw5h
+      security:
+        - bearerAuth: []
+  /api/goals/dashboard:
+    get:
+      summary: Goals dashboard
+      tags:
+        - goals
+      responses:
+        '200':
+          $ref: '#/components/responses/GoalDashboard200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      operationId: get-api-goals-dashboard
+      x-stoplight:
+        id: 7o1opx8vm5pyf
+      security:
+        - bearerAuth: []
+  /api/goals/top:
+    get:
+      summary: Top goals
+      tags:
+        - goals
+      responses:
+        '200':
+          $ref: '#/components/responses/GoalTop200'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      operationId: get-api-goals-top
+      x-stoplight:
+        id: 5sedi2ij1atd3
+      security:
+        - bearerAuth: []
+  /api/pockets/transactions/export:
+    get:
+      summary: Export operations
+      tags:
+        - transactions
+      responses:
+        '200':
+          description: ''
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  file:
+                    type: string
+                    x-stoplight:
+                      id: n3ir7y3sp9vma
+                    format: byte
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      operationId: get-api-pockets-transactions-export
+      x-stoplight:
+        id: kobctnb9s1nhm
+      description: ''
+      security:
+        - bearerAuth: []
+  /api/pockets/transactions/import:
+    post:
+      summary: Import operations
+      operationId: post-api-pockets-transactions-import
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      x-stoplight:
+        id: zrbgfthzjz6lv
+      tags:
+        - transactions
 components:
   securitySchemes:
     bearerAuth:
@@ -638,6 +779,26 @@ components:
           type: integer
         is_completed:
           type: boolean
+        created_at:
+          type: string
+          x-stoplight:
+            id: nb25i7pjm3s34
+          format: date
+        expire_date:
+          type: string
+          x-stoplight:
+            id: 6qpobluckmfqx
+          format: date
+        days_to_goal:
+          type: integer
+          x-stoplight:
+            id: jhnkytld8eud5
+          minimum: 0
+        accumulated_amount:
+          $ref: '#/components/schemas/Decimal'
+        accumulated_amount_cur_month:
+          $ref: '#/components/schemas/Decimal'
+      title: ''
     GoalRefill:
       title: GoalRefill
       type: object
@@ -661,6 +822,86 @@ components:
           type: integer
         percent:
           type: integer
+          minimum: 0
+          maximum: 100
+    TransactionCreate:
+      title: TransactionCreate
+      x-stoplight:
+        id: g1i0t0mc57hbw
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+        transaction_date:
+          type: string
+          x-stoplight:
+            id: yk26j957hnzte
+          format: date
+        amount:
+          $ref: '#/components/schemas/Decimal'
+        transaction_type:
+          x-stoplight:
+            id: 2p50a5qsnj6v7
+          enum:
+            - income
+            - expense
+    Category:
+      title: Category
+      x-stoplight:
+        id: eg6g98u7min0s
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: xiigfwtoe7j2b
+    GoalTopRetrieve:
+      title: GoalTopRetrieve
+      x-stoplight:
+        id: cjyn0enwsapog
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: zy86huyprvcxv
+        name:
+          type: string
+          x-stoplight:
+            id: 3beo94ipsytdd
+        target_amount:
+          $ref: '#/components/schemas/Decimal'
+        start_amount:
+          $ref: '#/components/schemas/Decimal'
+        category:
+          $ref: '#/components/schemas/CategoryBase'
+        created_at:
+          type: string
+          x-stoplight:
+            id: w4fe1687qi0ok
+          format: date
+        term:
+          type: integer
+          x-stoplight:
+            id: yf5r2t921x0wk
+          minimum: 0
+        percent:
+          type: integer
+          x-stoplight:
+            id: si6ofswo2e5q5
+        is_completed:
+          type: boolean
+          x-stoplight:
+            id: i2rm350bqp60a
+        expire_date:
+          type: string
+          x-stoplight:
+            id: mhokp6u6uhy9t
+          format: date
+        percentage_completion:
+          type: integer
+          x-stoplight:
+            id: gec2hl7pf9wan
           minimum: 0
           maximum: 100
   requestBodies:
@@ -700,20 +941,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              category:
-                type: number
-                description: category id
-              transaction_date:
-                type: string
-                format: date
-              amount:
-                type: number
-              transaction_type:
-                enum:
-                  - income
-                  - expense
+            $ref: '#/components/schemas/TransactionCreate'
       required: true
     CategoryCreateRequestBody:
       content:
@@ -725,15 +953,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GoalCreate'
-          examples:
-            Example 1:
-              value:
-                name: string
-                target_amount: 0
-                start_amount: 0
-                category: 0
-                term: 0
-                percent: 0
+          examples: {}
     GoalRefillRequestBody:
       content:
         application/json:
@@ -969,21 +1189,28 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              Топ категорий:
-                type: array
+            allOf:
+              - type: array
+                x-stoplight:
+                  id: xzut01feuh9dx
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    name:
-                      type: string
-                    transactions_sum:
-                      $ref: '#/components/schemas/Decimal'
-              другое:
-                $ref: '#/components/schemas/Decimal'
+                  $ref: '#/components/schemas/CategoryWithExpensesSums'
+              - type: object
+                x-stoplight:
+                  id: 5f4lk237dy83w
+                properties:
+                  id:
+                    type: string
+                    x-stoplight:
+                      id: lvd7cte2jbb2f
+                    default: null
+                    nullable: true
+                  name:
+                    type: string
+                    x-stoplight:
+                      id: k4k0jt2hrurv1
+                  transactions_sum:
+                    $ref: '#/components/schemas/Decimal'
     PermissionDenied:
       description: Example response
       content:
@@ -1003,18 +1230,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GoalRetrieve'
-          examples:
-            Example 1:
-              value:
-                id: 0
-                name: string
-                target_amount: 0
-                start_amount: 0
-                category:
-                  id: 0
-                  name: string
-                term: 0
-                percent: 0
+          examples: {}
     GoalsList200:
       description: Example response
       content:
@@ -1095,3 +1311,54 @@ components:
                 type: array
                 items:
                   type: string
+    GoalAnalyze200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              active_goals:
+                type: integer
+                x-stoplight:
+                  id: v6x6ussbi6y1e
+                minimum: 0
+                description: Количество незавершенных целей
+              most_closest_goal:
+                type: integer
+                x-stoplight:
+                  id: huc6tbtxaufr2
+                description: Количество дней до самой ближайшей цели
+              total_active_balance:
+                $ref: '#/components/schemas/Decimal'
+              total_percents_amount:
+                $ref: '#/components/schemas/Decimal'
+              percents_amount_cur_month:
+                $ref: '#/components/schemas/Decimal'
+              most_succesful_category:
+                $ref: '#/components/schemas/CategoryBase'
+              most_popular_category:
+                $ref: '#/components/schemas/CategoryBase'
+    GoalDashboard200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              total_income:
+                $ref: '#/components/schemas/Decimal'
+              total_expenses:
+                $ref: '#/components/schemas/Decimal'
+              total_percents:
+                $ref: '#/components/schemas/Decimal'
+              invested_amount_cur_month:
+                $ref: '#/components/schemas/Decimal'
+              most_expensive_category:
+                $ref: '#/components/schemas/CategoryWithExpensesSums'
+    GoalTop200:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GoalTopRetrieve'

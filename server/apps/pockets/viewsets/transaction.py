@@ -58,7 +58,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         return obj
 
-    @action(methods=('GET',), detail=False, url_path='global')
+    @action(methods=('GET',), detail=False)
     def total(self, request: Request, *args, **kwargs) -> Response:
         return super().retrieve(request, *args, **kwargs)
 
