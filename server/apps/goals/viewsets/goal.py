@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -22,6 +22,8 @@ from ...pockets.models import Transaction
 
 
 class GoalViewSet(viewsets.ModelViewSet):
+    pagination_class = pagination.LimitOffsetPagination
+    pagination_class.default_limit = 5
     permission_classes = (IsAuthenticated,)
     filterset_class = GoalFilter
     SERIALIZER_CLASS_MAP = {

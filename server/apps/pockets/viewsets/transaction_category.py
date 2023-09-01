@@ -1,13 +1,12 @@
 from typing import Type
 
 from django.db.models import QuerySet
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, pagination, serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from ..constants import TOP_CATEGORIES
 from ..filters import TransactionCategoryFilter
 from ..models import TransactionCategory
 from ..serializers import (
@@ -17,6 +16,8 @@ from ..serializers import (
 
 
 class TransactionCategoryViewSet(viewsets.ModelViewSet):
+    pagination_class = pagination.LimitOffsetPagination
+    pagination_class.default_limit = 10
     permission_classes = (IsAuthenticated,)
     http_method_names = ("get", "post",)
     filterset_class = TransactionCategoryFilter
