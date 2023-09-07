@@ -1,4 +1,6 @@
 from decimal import Decimal
+from typing import OrderedDict
+
 from rest_framework import serializers
 
 from ..constants import GoalError
@@ -44,5 +46,5 @@ class DepositCreateSerializer(serializers.ModelSerializer):
             return goal
 
     @property
-    def data(self):
+    def data(self) -> OrderedDict:
         return DepositRetrieveSerializer(instance=self.instance).data

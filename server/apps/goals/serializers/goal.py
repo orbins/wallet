@@ -76,7 +76,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
 class GoalUpdateSerializer(serializers.ModelSerializer):
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         if self.instance.is_completed:
             raise serializers.ValidationError(GoalError.CANT_UPDATE_COMPLETED)
         return attrs
@@ -103,7 +103,7 @@ class GoalUpdateSerializer(serializers.ModelSerializer):
                   'category', 'term', 'percent')
 
     @property
-    def data(self):
+    def data(self) -> OrderedDict:
         return GoalRetrieveSerializer(instance=self.instance).data
 
 

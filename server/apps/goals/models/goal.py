@@ -5,8 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from .managers import GoalManager
-from ..constants import GoalConstants, RefillTypes
-from .deposit import Deposit
+from ..constants import GoalConstants
 
 
 class Goal(models.Model):

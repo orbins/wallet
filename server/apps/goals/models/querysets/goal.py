@@ -1,4 +1,5 @@
-import decimal
+from decimal import Decimal
+from typing import Union
 
 from django.db.models import (
     QuerySet, F, Q,
@@ -15,7 +16,7 @@ from ....pockets.models import TransactionCategory
 
 class GoalQuerySet(QuerySet):
 
-    def annotate_with_days_to_goal(self) -> QuerySet:
+    def annotate_with_days_to_goal(self):
         return self.annotate(
             days_to_goal=Coalesce(
                 ExtractDay(F('expire_date') - timezone.now().date()),
@@ -24,7 +25,7 @@ class GoalQuerySet(QuerySet):
             )
         )
 
-    def annotate_with_accumulated_amount(self) -> QuerySet:
+    def annotate_with_accumulated_amount(self):
         return self.annotate(
             accumulated_amount=Coalesce(
                 Sum('deposits__amount'),
@@ -44,7 +45,7 @@ class GoalQuerySet(QuerySet):
             )
         )
 
-    def total_active_balance(self):
+    def total_active_balance(self) -> dict[str, Decimal]:
         return self.aggregate(
             total_active_balance=Coalesce(
                 Sum(
@@ -56,7 +57,7 @@ class GoalQuerySet(QuerySet):
             )
         )
 
-    def percents_amount(self):
+    def percents_amount(self) -> dict[str, Decimal]:
         return self.aggregate(
             total_percents_amount=Coalesce(
                 Sum(
@@ -85,14 +86,14 @@ class GoalQuerySet(QuerySet):
             )
         )
 
-    def get_most_popular_category(self):
+    def get_most_popular_category(self) -> int:
         obj = self.values('category').annotate(
             goal_count=Count('id')
         ).order_by('-goal_count').first()
 
         return obj['category'] if obj else None
 
-    def get_most_successful_category(self):
+    def get_most_successful_category(self) -> int:
         obj = self.filter(
             is_completed=True,
         ).values(
@@ -105,7 +106,7 @@ class GoalQuerySet(QuerySet):
 
         return obj['category'] if obj else None
 
-    def get_analytical_data(self):
+    def get_analytical_data(self) -> dict[str, Union[TransactionCategory, Decimal, int]]:
         most_closest_goal = self.filter(
             is_completed=False
         ).annotate_with_days_to_goal().order_by(

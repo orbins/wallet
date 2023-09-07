@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import Optional, Any
 
 from openpyxl import Workbook, load_workbook
 from rest_framework import serializers, status
@@ -27,31 +28,31 @@ class TransactionFileHandler:
         for transaction in self.transactions:
             self.ws.append([
                 transaction.transaction_date,
-                'Доход' if transaction.transaction_type == 'income' else 'Расход',
+                transaction.transaction_type,
                 transaction.category.name if transaction.category else None,
                 transaction.amount
             ])
 
-    def save_file(self):
+    def save_file(self) -> BytesIO:
         file = BytesIO()
         self.wb.save(file)
         file.seek(0)
 
         return file
 
-    def export_transactions_to_excel(self):
+    def export_transactions_to_excel(self) -> BytesIO:
         self.save_transactions_to_worksheet()
         file = self.save_file()
 
         return file
 
-    def load_data_from_worksheet(self, request):
+    def load_data_from_worksheet(self, request) -> (list[dict[str, Any]], list[dict[str, Any]]):
         errors = []
         for row in self.ws.iter_rows(min_row=2, values_only=True):
             transaction_date, transaction_type, category_name, amount = row
             if transaction_date == transaction_type:
                 continue
-            if transaction_type != TransactionTypes.CHOICES_DICT[TransactionTypes.INCOME]:
+            if transaction_type == TransactionTypes.EXPENSE:
                 category, _ = TransactionCategory.objects.get_or_create(
                     user=request.user,
                     name__iexact=category_name,
@@ -61,7 +62,7 @@ class TransactionFileHandler:
                 category = None
             transaction = {
                 'transaction_date': transaction_date.date(),
-                'transaction_type': 'income' if transaction_type == 'Доход' else 'expense',
+                'transaction_type': transaction_type,
                 'category': category.id if category else None,
                 'amount': amount,
                 'user': request.user
@@ -91,7 +92,7 @@ class TransactionFileHandler:
         serializer.is_valid()
         serializer.save()
 
-    def import_transactions_from_excel(self, request):
+    def import_transactions_from_excel(self, request) -> (int, Optional[dict[str, Any]]):
         if not self.wb:
             return status.HTTP_400_BAD_REQUEST, {
                 'error': "Ошибка чтения файла"

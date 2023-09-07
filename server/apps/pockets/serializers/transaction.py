@@ -34,7 +34,7 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         else:
             return category
 
-    def validate_transaction_type(self, transaction_type):
+    def validate_transaction_type(self, transaction_type) -> Transaction.transaction_type:
         if transaction_type == TransactionTypes.PERCENTS:
             raise serializers.ValidationError(TransactionErrors.INCORRECT_TRANSACTION_TYPE)
 

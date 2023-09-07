@@ -1,6 +1,8 @@
+from typing import Type
+
 from django.db.models import QuerySet
 from django.utils import timezone
-from rest_framework import viewsets, pagination
+from rest_framework import viewsets, pagination, serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -38,7 +40,7 @@ class GoalViewSet(viewsets.ModelViewSet):
         'analyze': GoalAnalyzeSerializer,
     }
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         return self.SERIALIZER_CLASS_MAP.get(
             self.action,
             GoalRetrieveSerializer
@@ -59,7 +61,7 @@ class GoalViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_object(self):
+    def get_object(self) -> Goal:
         queryset = self.get_queryset()
         if self.action == 'analyze':
             obj = self.filter_queryset(queryset).get_analytical_data()

@@ -1,5 +1,6 @@
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,7 +14,7 @@ class DashboardView(APIView):
     permission_classes = (IsAuthenticated, )
     http_method_names = ['get']
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         transactions = Transaction.objects.filter(
             user=self.request.user,
             transaction_date__month=timezone.now().month
