@@ -7,7 +7,8 @@ from ...constants import TOP_CATEGORIES
 class TransactionCategoryQuerySet(QuerySet):
     def annotate_with_transaction_sums(self):
         """
-        :return: TransactionCategoryQuerySet
+        Возвращает queryset категорий
+        с общей суммой операций по ним для юзера
         """
 
         return self.annotate(
@@ -20,7 +21,8 @@ class TransactionCategoryQuerySet(QuerySet):
 
     def annotate_with_goals_counter(self):
         """
-        :return: TransactionCategoryQuerySet
+        Возвращает queryset категорий с количеством
+        созданных целей по ним для юзера
         """
 
         return self.annotate(
@@ -32,6 +34,7 @@ class TransactionCategoryQuerySet(QuerySet):
         )
 
     def get_top_with_others(self):
+        """Возвращает топ категорий по тратам"""
         data = list(self[:TOP_CATEGORIES])
         other_categories_amount = self[TOP_CATEGORIES:].aggregate(
             total_amount=Sum('transactions_sum')

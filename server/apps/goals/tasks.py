@@ -11,6 +11,10 @@ from ..pockets.constants import TransactionTypes
 
 @shared_task
 def calculate_daily_percent():
+    """
+    Начисляет проценты на все незавершенные цели
+    всех пользователей
+    """
     goals = Goal.objects.filter(is_completed=False)
     for goal in goals:
         deposit_queryset = Deposit.objects.filter(goal=goal).aggregate_amount()

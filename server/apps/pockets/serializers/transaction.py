@@ -8,6 +8,7 @@ from .transaction_category import CategorySerializer
 
 
 class TransactionRetrieveSerializer(serializers.ModelSerializer):
+    """Сериализатор получения операций"""
     category = CategorySerializer(required=False)
 
     class Meta:
@@ -16,6 +17,7 @@ class TransactionRetrieveSerializer(serializers.ModelSerializer):
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор создания операций"""
     category = serializers.PrimaryKeyRelatedField(
         queryset=TransactionCategory.objects.all(),
         allow_null=True,
@@ -74,9 +76,11 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
 
 
 class TransactionGlobalSerializer(serializers.Serializer):
+    """Сериализатор для общих данных"""
     total_income = serializers.DecimalField(max_digits=12, decimal_places=2)
     total_expenses = serializers.DecimalField(max_digits=12, decimal_places=2)
 
 
 class BalanceSerializer(serializers.Serializer):
+    """Сериализатор для баланса"""
     balance = serializers.DecimalField(max_digits=12, decimal_places=2)

@@ -17,6 +17,10 @@ from ....pockets.models import TransactionCategory
 class GoalQuerySet(QuerySet):
 
     def annotate_with_days_to_goal(self):
+        """
+        Возвращает queryset целей
+        с количеством дней до их завершения
+        """
         return self.annotate(
             days_to_goal=Coalesce(
                 ExtractDay(F('expire_date') - timezone.now().date()),
@@ -26,6 +30,10 @@ class GoalQuerySet(QuerySet):
         )
 
     def annotate_with_accumulated_amount(self):
+        """
+        Возвращает queryset целей
+        накопленной суммой
+        """
         return self.annotate(
             accumulated_amount=Coalesce(
                 Sum('deposits__amount'),
@@ -46,6 +54,10 @@ class GoalQuerySet(QuerySet):
         )
 
     def total_active_balance(self) -> dict[str, Decimal]:
+        """
+        Подсчитывает общую сумму средств,
+        вложенную во все незавершенные цели
+        """
         return self.aggregate(
             total_active_balance=Coalesce(
                 Sum(
@@ -58,6 +70,10 @@ class GoalQuerySet(QuerySet):
         )
 
     def percents_amount(self) -> dict[str, Decimal]:
+        """
+        Высчитывает количество процентов начисленных на цель,
+        за все время и за текущий месяц
+        """
         return self.aggregate(
             total_percents_amount=Coalesce(
                 Sum(
@@ -87,6 +103,10 @@ class GoalQuerySet(QuerySet):
         )
 
     def get_most_popular_category(self) -> int:
+        """
+        Возвращает категорию с наибольшим
+        количеством созданных целей
+        """
         obj = self.values('category').annotate(
             goal_count=Count('id')
         ).order_by('-goal_count').first()
@@ -94,6 +114,10 @@ class GoalQuerySet(QuerySet):
         return obj['category'] if obj else None
 
     def get_most_successful_category(self) -> int:
+        """
+        Возвращает категорию с наибольшим
+        количеством завершенных целей
+        """
         obj = self.filter(
             is_completed=True,
         ).values(
@@ -107,6 +131,7 @@ class GoalQuerySet(QuerySet):
         return obj['category'] if obj else None
 
     def get_analytical_data(self) -> dict[str, Union[TransactionCategory, Decimal, int]]:
+        """Возвращает статистические данные"""
         most_closest_goal = self.filter(
             is_completed=False
         ).annotate_with_days_to_goal().order_by(
@@ -136,6 +161,10 @@ class GoalQuerySet(QuerySet):
         return data
 
     def annotate_with_percentage_completion(self):
+        """
+        Возвращает queryset целей
+        с индикатором завершенности в процентах
+        """
         return self.annotate(
             percentage_completion=Coalesce(
                 Sum('deposits__amount') / F('target_amount') * 100,

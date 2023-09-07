@@ -7,6 +7,7 @@ from ..constants import DepositConstants, RefillTypes
 
 
 class Deposit(models.Model):
+    """Модель вложений в цель"""
     goal = models.ForeignKey(
         to='goals.Goal',
         on_delete=models.CASCADE,

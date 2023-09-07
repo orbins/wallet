@@ -126,16 +126,20 @@ class GoalViewSet(viewsets.ModelViewSet):
 
     @action(methods=('POST',), detail=False)
     def refill(self, request: Request, *args, **kwargs) -> Response:
+        """Поплнение цели"""
         return super().create(request, *args, **kwargs)
 
     @action(methods=('PATCH',), detail=True)
     def complete(self, request: Request, *args, **kwargs) -> Response:
+        """Завершение цели"""
         return super().partial_update(request, *args, **kwargs)
 
     @action(methods=('GET',), detail=False)
     def analyze(self, request: Request, *args, **kwargs) -> Response:
+        """Общая статистика по целям"""
         return super().retrieve(request, *args, **kwargs)
 
     @action(methods=('GET',), detail=False)
     def top(self, request: Request, *args, **kwargs) -> Response:
+        """Топ целей по завершенности"""
         return super().list(request, *args, **kwargs)

@@ -9,6 +9,10 @@ from ...constants import TransactionTypes
 class TransactionQuerySet(QuerySet):
 
     def aggregate_totals(self) -> dict[str, Decimal]:
+        """
+        Возвращает общие доходы, расходы и проценты,
+        начисленные на цели
+        """
         return self.aggregate(
             total_income=Coalesce(
                 Sum(
@@ -38,6 +42,7 @@ class TransactionQuerySet(QuerySet):
         )
 
     def calculate_balance(self) -> dict[str, Decimal]:
+        """Подсчитывает текущий баланс пользователя"""
         return self.aggregate(
             balance=
             Coalesce(

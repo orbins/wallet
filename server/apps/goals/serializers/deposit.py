@@ -10,6 +10,7 @@ from ..serializers import GoalRetrieveSerializer
 
 
 class DepositRetrieveSerializer(serializers.ModelSerializer):
+    """Сериализатор получения объектов пополнений целей"""
     goal = GoalRetrieveSerializer()
 
     class Meta:
@@ -18,6 +19,7 @@ class DepositRetrieveSerializer(serializers.ModelSerializer):
 
 
 class DepositCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор создания объектов пополнений целей"""
 
     class Meta:
         model = Deposit

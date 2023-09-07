@@ -8,6 +8,7 @@ from ..constants import TransactionTypes
 
 
 class Transaction(models.Model):
+    """Модель операций"""
     user = models.ForeignKey(
         to='users.User',
         on_delete=models.CASCADE,

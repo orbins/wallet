@@ -12,6 +12,7 @@ from ...pockets.constants import TransactionErrors
 
 
 class GoalRetrieveSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения целей"""
     category = CategorySerializer()
     days_to_goal = serializers.IntegerField(
         read_only=True
@@ -41,6 +42,7 @@ class GoalRetrieveSerializer(serializers.ModelSerializer):
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания целей"""
 
     class Meta:
         model = Goal
@@ -75,6 +77,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
 
 class GoalUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления целей"""
 
     def validate(self, attrs: dict) -> dict:
         if self.instance.is_completed:
@@ -108,6 +111,7 @@ class GoalUpdateSerializer(serializers.ModelSerializer):
 
 
 class GoalCompleteSerializer(serializers.Serializer):
+    """Сериализатор для заверщения целей"""
 
     def validate(self, attrs: dict) -> dict:
         goal = self.instance
@@ -133,6 +137,7 @@ class GoalCompleteSerializer(serializers.Serializer):
 
 
 class GoalAnalyzeSerializer(serializers.Serializer):
+    """Сериализатор для возврата статистики по целям"""
     active_goals = serializers.IntegerField()
     most_closest_goal = serializers.IntegerField()
     total_active_balance = serializers.DecimalField(

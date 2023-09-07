@@ -4,6 +4,7 @@ from ..models import TransactionCategory
 
 
 class TransactionCategoryFilter(filters.FilterSet):
+    """Фильтр для категорий операций"""
     month = filters.NumberFilter(field_name="transactions__transaction_date", lookup_expr="month")
 
     class Meta:

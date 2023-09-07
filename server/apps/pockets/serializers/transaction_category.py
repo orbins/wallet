@@ -5,6 +5,7 @@ from ..models import TransactionCategory
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор создания категорий"""
 
     class Meta:
         model = TransactionCategory
@@ -31,6 +32,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CategoryRetrieveSerializer(serializers.ModelSerializer):
+    """Сериализатор получения категорий"""
     transactions_sum = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:

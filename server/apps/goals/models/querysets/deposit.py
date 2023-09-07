@@ -7,6 +7,7 @@ from django.db.models.functions import Coalesce
 class DepositQuerySet(QuerySet):
 
     def aggregate_amount(self) -> dict[str, Decimal]:
+        """Подсчитывает общую сумму вложений в цель"""
         return self.aggregate(
             total_amount=Coalesce(
                 Sum(

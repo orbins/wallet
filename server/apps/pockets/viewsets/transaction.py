@@ -60,14 +60,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     @action(methods=('GET',), detail=False)
     def total(self, request: Request, *args, **kwargs) -> Response:
+        """Сводные данные по операциям"""
         return super().retrieve(request, *args, **kwargs)
 
     @action(methods=('GET',), detail=False, url_path='balance')
     def get_balance(self, request: Request, *args, **kwargs) -> Response:
+        """Получение текущего баланса счёта"""
         return super().retrieve(request, *args, **kwargs)
 
     @action(methods=('GET',), detail=False, url_path='export')
     def export_data(self, request: Request, *args, **kwargs) -> FileResponse:
+        """Экспорт данных"""
         transactions = self.get_queryset().only(
             'category', 'transaction_date',
             'amount', 'transaction_type'
@@ -80,6 +83,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     @action(methods=('POST',), detail=False, url_path='import')
     def import_data(self, request: Request, *args, **kwargs) -> Response:
+        """Импорт данных"""
         try:
             response_status, data = TransactionFileHandler(
                 file=request.FILES['file']

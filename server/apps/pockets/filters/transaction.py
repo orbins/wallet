@@ -4,6 +4,7 @@ from ..models import Transaction
 
 
 class TransactionFilter(filters.FilterSet):
+    """Фильтр для операций"""
     month = filters.NumberFilter(field_name="transaction_date", lookup_expr="month")
     year = filters.NumberFilter(field_name="transaction_date", lookup_expr="year")
     order_by = filters.OrderingFilter(

@@ -41,6 +41,7 @@ class TransactionCategoryViewSet(viewsets.ModelViewSet):
 
     @action(methods=('GET',), detail=False, url_path='top')
     def get_top(self, request: Request, *args, **kwargs) -> Response:
+        """Топ категорий по тратам"""
         data = self.get_queryset().get_top_with_others()
         serializer = self.get_serializer(data, many=True)
         return Response(serializer.data)

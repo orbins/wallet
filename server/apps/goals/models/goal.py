@@ -9,6 +9,7 @@ from ..constants import GoalConstants
 
 
 class Goal(models.Model):
+    """модель целей"""
     user = models.ForeignKey(
         to='users.User',
         on_delete=models.CASCADE,

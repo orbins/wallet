@@ -12,3 +12,6 @@ class TransactionCategoryManager(Manager):
 
     def annotate_with_goals_counter(self) -> TransactionCategoryQuerySet:
         return self.get_queryset().annotate_with_goals_counter()
+
+    def get_top_with_others(self) -> TransactionCategoryQuerySet:
+        return self.get_queryset().get_top_with_others()

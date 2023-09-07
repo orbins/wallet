@@ -15,6 +15,7 @@ class DashboardView(APIView):
     http_method_names = ['get']
 
     def get(self, request: Request) -> Response:
+        """Получение статистики для дашборда"""
         transactions = Transaction.objects.filter(
             user=self.request.user,
             transaction_date__month=timezone.now().month
