@@ -49,7 +49,7 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         queryset = Goal.objects.filter(
             user=self.request.user,
-        ).order_by('-created_at')
+        ).select_related('category').order_by('-created_at')
         if self.action in ('list', 'retrieve'):
             queryset = queryset.annotate_with_days_to_goal(
             ).annotate_with_accumulated_amount()
