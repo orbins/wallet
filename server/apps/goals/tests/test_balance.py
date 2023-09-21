@@ -9,8 +9,13 @@ from ...pockets.models.transaction import Transaction
 from ...pockets.models.transaction_category import TransactionCategory
 from ...users.models.user import User
 
-
-start_amount = 10000
+GOAL_CREATION_DATA_SET = [
+    Decimal('1000'),
+    Decimal('5000.99'),
+    Decimal('18000.01'),
+    Decimal('50000'),
+    Decimal('249.50')
+]
 
 
 class TestBalanceChange(APITestCase):
@@ -50,28 +55,30 @@ class TestBalanceChange(APITestCase):
         Проверяет, что при создании цели со счета списывается сумма,
         указанная в запросе при создании цели.
         """
-        initial_balance = self.client.get(
-            reverse('transactions-get-balance')
-        ).data['balance']
-        response = self.client.post(
-            reverse('goals-list'),
-            data={
-                'user': self.user,
-                'name': 'Тестовая цель',
-                'category': 1,
-                'start_amount': start_amount,
-                'target_amount': 50000,
-                'term': 3,
-                'percent': 5,
-            }
-        )
-        balance_after = self.client.get(
-            reverse('transactions-get-balance')
-        ).data['balance']
-        self.assertEqual(
-            Decimal(balance_after),
-            Decimal(initial_balance) - start_amount
-        )
+        for i, start_amount in enumerate(GOAL_CREATION_DATA_SET):
+            with self.subTest(i=i, start_amount=start_amount):
+                balance_before = self.client.get(
+                    reverse('transactions-get-balance')
+                ).data['balance']
+                self.client.post(
+                    reverse('goals-list'),
+                    data={
+                        'user': self.user,
+                        'name': f'Тестовая цель {i}',
+                        'category': 1,
+                        'start_amount': start_amount,
+                        'target_amount': 50000,
+                        'term': 3,
+                        'percent': 5,
+                    }
+                )
+                balance_after = self.client.get(
+                    reverse('transactions-get-balance')
+                ).data['balance']
+                self.assertEqual(
+                    Decimal(balance_before),
+                    Decimal(balance_after) + start_amount
+                )
 
     def tearDown(self):
         Transaction.objects.filter(user=self.user).delete()
