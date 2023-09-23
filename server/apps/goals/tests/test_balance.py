@@ -17,6 +17,14 @@ GOAL_CREATION_DATA_SET = [
     Decimal('249.50')
 ]
 
+TARGET_AMOUNT_DATA_SET = [
+    Decimal('2000'),
+    Decimal('10000.30'),
+    Decimal('20000'),
+    Decimal('60000'),
+    Decimal('749.77')
+]
+
 
 class TestBalanceChange(APITestCase):
 
@@ -65,7 +73,7 @@ class TestBalanceChange(APITestCase):
                     data={
                         'user': self.user,
                         'name': f'Тестовая цель {i}',
-                        'category': 1,
+                        'category': self.category.id,
                         'start_amount': start_amount,
                         'target_amount': 50000,
                         'term': 3,
@@ -78,6 +86,51 @@ class TestBalanceChange(APITestCase):
                 self.assertEqual(
                     Decimal(balance_before),
                     Decimal(balance_after) + start_amount
+                )
+
+    def test_balance_on_goal_completion(self):
+        """
+        Проверяет, что при завершении цели, накопленная
+        на неё сумма возвращается на счёт.
+        """
+        for i, target_amount in enumerate(TARGET_AMOUNT_DATA_SET):
+            with self.subTest(i=i, refill_amount=target_amount):
+                self.client.post(
+                    reverse('goals-list'),
+                    data={
+                        'user': self.user,
+                        'name': f'Тестовая цель {i}',
+                        'category': self.category.id,
+                        'start_amount': 0,
+                        'target_amount': target_amount,
+                        'term': 3,
+                        'percent': 5,
+                    }
+                )
+                goal = Goal.objects.get(
+                    user=self.user,
+                    name__contains=f'Тестовая цель {i}'
+                )
+                self.client.post(
+                    reverse('goals-refill'),
+                    data={
+                        'goal': goal.id,
+                        'amount': target_amount,
+                    }
+                )
+                balance_before = self.client.get(
+                    reverse('transactions-get-balance')
+                ).data['balance']
+                self.client.patch(
+                    reverse('goals-complete', args=[goal.id]),
+                )
+                balance_after = self.client.get(
+                    reverse('transactions-get-balance')
+                ).data['balance']
+
+                self.assertEqual(
+                    Decimal(balance_after),
+                    Decimal(balance_before) + target_amount
                 )
 
     def tearDown(self):
