@@ -78,6 +78,53 @@ class TestPercents(APITestCase):
                     expected
                 )
 
+    def test_not_calculate_to_completed(self):
+        """
+        Проверяет, что на завершенные цели
+        не начисляются проценты
+        """
+        for i, (start_amount, target_amount, percent, expected) in enumerate(DefaultTestData.GOAL_CREATION_DATA_SET):
+            with self.subTest(
+                    i=i,
+                    start_amount=start_amount,
+                    target_amount=target_amount,
+                    percent=percent,
+                    expected=expected
+            ):
+                self.client.post(
+                    reverse('goals-list'),
+                    data={
+                        'user': self.user,
+                        'name': f'Тестовая цель {i}',
+                        'category': self.category.id,
+                        'start_amount': start_amount,
+                        'target_amount': target_amount,
+                        'term': 3,
+                        'percent': percent,
+                    }
+                )
+                goal = Goal.objects.get(
+                    user=self.user,
+                    name__exact=f'Тестовая цель {i}',
+                )
+                self.client.post(
+                    reverse('goals-refill'),
+                    data={
+                        'goal': goal.id,
+                        'amount': target_amount - start_amount,
+                    }
+                )
+                self.client.patch(
+                    reverse('goals-complete', args=[goal.id]),
+                )
+                count_before = Transaction.objects.all().count()
+                calculate_daily_percent()
+                count_after = Transaction.objects.all().count()
+                self.assertEqual(
+                    count_before,
+                    count_after
+                )
+
     def tearDown(self):
         Transaction.objects.filter(user=self.user).delete()
         Goal.objects.filter(user=self.user).delete()
