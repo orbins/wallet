@@ -9,22 +9,6 @@ from ...pockets.models.transaction import Transaction
 from ...pockets.models.transaction_category import TransactionCategory
 from ...users.models.user import User
 
-GOAL_CREATION_DATA_SET = [
-    Decimal('1000'),
-    Decimal('5000.99'),
-    Decimal('18000.01'),
-    Decimal('50000'),
-    Decimal('249.50')
-]
-
-TARGET_AMOUNT_DATA_SET = [
-    Decimal('2000'),
-    Decimal('10000.30'),
-    Decimal('20000'),
-    Decimal('60000'),
-    Decimal('749.77')
-]
-
 
 class TestBalanceChange(APITestCase):
 
@@ -63,7 +47,7 @@ class TestBalanceChange(APITestCase):
         Проверяет, что при создании цели со счета списывается сумма,
         указанная в запросе при создании цели.
         """
-        for i, start_amount in enumerate(GOAL_CREATION_DATA_SET):
+        for i, start_amount in enumerate(DefaultTestData.GOAL_CREATION_DATA_SET):
             with self.subTest(i=i, start_amount=start_amount):
                 balance_before = self.client.get(
                     reverse('transactions-get-balance')
@@ -93,7 +77,7 @@ class TestBalanceChange(APITestCase):
         Проверяет, что при завершении цели, накопленная
         на неё сумма возвращается на счёт.
         """
-        for i, target_amount in enumerate(TARGET_AMOUNT_DATA_SET):
+        for i, target_amount in enumerate(DefaultTestData.TARGET_AMOUNT_DATA_SET):
             with self.subTest(i=i, refill_amount=target_amount):
                 self.client.post(
                     reverse('goals-list'),
