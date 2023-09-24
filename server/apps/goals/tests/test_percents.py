@@ -76,10 +76,10 @@ class TestPercents(APITestCase):
         Проверяет, что на завершенные цели
         не начисляются проценты
         """
-        count_before = Transaction.objects.all().count()
+        count_before = Transaction.objects.filter(user=self.user).count()
         Goal.objects.update(is_completed=True)
         calculate_daily_percent()
-        count_after = Transaction.objects.all().count()
+        count_after = Transaction.objects.filter(user=self.user).count()
         self.assertEqual(count_before, count_after)
 
     def tearDown(self):
