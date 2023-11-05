@@ -23,6 +23,7 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False
     )
+    transaction_type = serializers.CharField(required=True)
 
     class Meta:
         model = Transaction

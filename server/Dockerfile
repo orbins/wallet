@@ -1,4 +1,4 @@
-FROM python:3.9.4-slim
+FROM python:3.11-slim
 
 RUN mkdir /server && apt-get update && apt-get install -y git libpq-dev postgresql-client
 WORKDIR /server

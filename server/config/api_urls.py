@@ -7,4 +7,5 @@ urlpatterns = [
     path('users/', include('apps.users.urls.users_urls')),
     path('pockets/', include(pockets_router.urls)),
     path('goals/', include('apps.goals.urls')),
+    path('quotes/', include('apps.quotes.urls')),
 ]

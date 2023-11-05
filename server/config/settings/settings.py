@@ -37,7 +37,8 @@ INSTALLED_APPS = [
 LOCAL_APPS = [
     'apps.users',
     'apps.pockets',
-    'apps.goals'
+    'apps.goals',
+    'apps.quotes'
 ]
 
 INSTALLED_APPS += LOCAL_APPS
