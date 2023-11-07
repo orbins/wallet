@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 
-from .routers import quotes_router
+from ..quotes.views import QuoteCreateRetriveView
 
 urlpatterns = [
-    path('', include(quotes_router.urls)),
+    path('', QuoteCreateRetriveView.as_view()),
 ]
